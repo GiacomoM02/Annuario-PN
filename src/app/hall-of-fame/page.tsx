@@ -5,11 +5,16 @@ import { HallOfFameBoard } from "@/components/HallOfFameBoard";
 export const dynamic = "force-dynamic"; // sempre dati freschi: pagina "viva"
 
 async function getInitialEntries() {
-  return db
-    .select()
-    .from(schema.hallOfFameEntries)
-    .orderBy(desc(schema.hallOfFameEntries.createdAt))
-    .limit(60);
+  try {
+    return await db
+      .select()
+      .from(schema.hallOfFameEntries)
+      .orderBy(desc(schema.hallOfFameEntries.createdAt))
+      .limit(60);
+  } catch (err) {
+    console.error("Impossibile leggere hall_of_fame_entries:", err);
+    return [];
+  }
 }
 
 export default async function HallOfFamePage() {

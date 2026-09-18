@@ -3,13 +3,23 @@ import { Download, FileText } from "lucide-react";
 import { db, schema } from "@/lib/db";
 import { desc } from "drizzle-orm";
 
-export const revalidate = 3600; // le edizioni passate cambiano raramente
+// Renderizzata a runtime (non in fase di build): evita che "next build" provi
+// a interrogare il database prima che lo schema/le tabelle esistano davvero,
+// ed è comunque presto invalidata da revalidatePath quando cambia l'archivio.
+export const dynamic = "force-dynamic";
 
 async function getEditions() {
-  return db
-    .select()
-    .from(schema.archivedEditions)
-    .orderBy(desc(schema.archivedEditions.year));
+  try {
+    return await db
+      .select()
+      .from(schema.archivedEditions)
+      .orderBy(desc(schema.archivedEditions.year));
+  } catch (err) {
+    // Tabella non ancora creata (schema non applicato con "npm run db:push")
+    // o Postgres non collegato: mostriamo lo stato vuoto invece di crashare.
+    console.error("Impossibile leggere archived_editions:", err);
+    return [];
+  }
 }
 
 export default async function ArchivioPage() {
