@@ -4,7 +4,24 @@ import { Redis } from "@upstash/redis";
 // l'indirizzo email transita durante la verifica. Non è mai scritto nel
 // database Postgres dell'applicazione. Dopo OTP_TTL_SECONDS Redis elimina
 // da solo la chiave, anche in caso di errore applicativo.
-const redis = Redis.fromEnv();
+//
+// A seconda di come è stato collegato lo store Upstash su Vercel, le
+// variabili d'ambiente possono chiamarsi UPSTASH_REDIS_REST_URL/TOKEN
+// (nome "standard" di Upstash) oppure KV_REST_API_URL/KV_REST_API_TOKEN
+// (nome usato dall'integrazione Marketplace di Vercel). Supportiamo
+// entrambi per non dipendere da quale via è stata usata per il collegamento.
+const REDIS_URL =
+  process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+const REDIS_TOKEN =
+  process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+
+if (!REDIS_URL || !REDIS_TOKEN) {
+  throw new Error(
+    "Variabili Redis mancanti: imposta UPSTASH_REDIS_REST_URL/UPSTASH_REDIS_REST_TOKEN oppure KV_REST_API_URL/KV_REST_API_TOKEN su Vercel."
+  );
+}
+
+const redis = new Redis({ url: REDIS_URL, token: REDIS_TOKEN });
 
 const OTP_TTL_SECONDS = 5 * 60; // 5 minuti
 const OTP_MAX_ATTEMPTS = 5;
