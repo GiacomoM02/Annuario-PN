@@ -1,11 +1,20 @@
 import { Resend } from "resend";
 
+if (!process.env.RESEND_API_KEY) {
+  throw new Error("RESEND_API_KEY non configurata.");
+}
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendOtpEmail(email: string, code: string) {
   const from = process.env.RESEND_FROM_EMAIL || "Annuario del PN <onboarding@resend.dev>";
 
-  await resend.emails.send({
+  // L'SDK di Resend NON lancia un'eccezione sugli errori dell'API: li
+  // restituisce dentro il campo "error" della risposta. Se non lo si
+  // controlla esplicitamente, un invio fallito sembra "riuscito" a chi
+  // chiama questa funzione. Qui lo controlliamo e rilanciamo come errore
+  // vero, cosÃ¬ risale fino ai log e al messaggio mostrato all'utente.
+  const { data, error } = await resend.emails.send({
     from,
     to: email,
     subject: `Il tuo codice: ${code} — Annuario del PN`,
@@ -20,4 +29,11 @@ export async function sendOtpEmail(email: string, code: string) {
       </div>
     `,
   });
+
+  if (error) {
+    console.error("Resend error:", error);
+    throw new Error(`Invio email fallito: ${error.message || error.name}`);
+  }
+
+  console.log("Resend email queued:", data?.id);
 }
