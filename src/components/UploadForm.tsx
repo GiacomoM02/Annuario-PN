@@ -1,16 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import {
-  sendOtpAction,
-  verifyOtpAction,
+  checkEmailDomainAction,
   createEntryAction,
 } from "@/app/hall-of-fame/actions";
 import { cn } from "@/lib/utils";
 import type { HallOfFameEntry } from "../../drizzle/schema";
 
-type Step = "email" | "otp" | "details";
+type Step = "email" | "details";
 
 export function UploadForm({
   onUploaded,
@@ -19,42 +18,26 @@ export function UploadForm({
 }) {
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [verificationToken, setVerificationToken] = useState<string | null>(
-    null
-  );
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  // --- Step 1: invia OTP -----------------------------------------------
-  function handleSendOtp(e: React.FormEvent) {
+  // --- Step 1: controlla che l'email sia @unipi.it / @studenti.unipi.it ---
+  // Nessun codice inviato: solo un controllo di formato, non una vera prova
+  // di proprietà dell'indirizzo. Scelta accettata per un sito ad uso interno.
+  function handleCheckEmail(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const result = await sendOtpAction(email);
+      const result = await checkEmailDomainAction(email);
       if (!result.ok) return setError(result.error);
-      setStep("otp");
-    });
-  }
-
-  // --- Step 2: verifica OTP ----------------------------------------------
-  function handleVerifyOtp(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    startTransition(async () => {
-      const result = await verifyOtpAction(email, code);
-      if (!result.ok) return setError(result.error);
-      setVerificationToken(result.data.token);
       setStep("details");
     });
   }
 
-  // --- Step 3: dettagli foto + upload -------------------------------------
+  // --- Step 2: dettagli foto + upload -------------------------------------
   function handleSubmitEntry(formData: FormData) {
     setError(null);
-    if (verificationToken) {
-      formData.set("verificationToken", verificationToken);
-    }
+    formData.set("email", email);
     startTransition(async () => {
       const result = await createEntryAction(formData);
       if (!result.ok) return setError(result.error);
@@ -73,7 +56,7 @@ export function UploadForm({
       )}
 
       {step === "email" && (
-        <form onSubmit={handleSendOtp} className="space-y-4">
+        <form onSubmit={handleCheckEmail} className="space-y-4">
           <Field label="Email istituzionale">
             <input
               type="email"
@@ -85,57 +68,14 @@ export function UploadForm({
             />
           </Field>
           <p className="text-xs text-ink-700/70">
-            Serve solo per verificare che sei dell'Università di Pisa: non
-            viene mai salvata.
+            Deve terminare con @unipi.it o @studenti.unipi.it.
           </p>
-          <SubmitButton pending={isPending}>Invia codice</SubmitButton>
-        </form>
-      )}
-
-      {step === "otp" && (
-        <form onSubmit={handleVerifyOtp} className="space-y-4">
-          <p className="text-sm text-ink-700">
-            Abbiamo inviato un codice a <strong>{email}</strong>.
-          </p>
-          <Field label="Codice a 6 cifre">
-            <input
-              type="text"
-              required
-              inputMode="numeric"
-              maxLength={6}
-              pattern="[0-9]{6}"
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-              className={cn(inputClass, "tracking-[0.4em]")}
-            />
-          </Field>
-          <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => setStep("email")}
-              className="text-xs text-ink-700 underline"
-            >
-              Cambia email
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSendOtp(new Event("submit") as any)}
-              className="text-xs text-brass-600 underline"
-            >
-              Rinvia codice
-            </button>
-          </div>
-          <SubmitButton pending={isPending}>Verifica</SubmitButton>
+          <SubmitButton pending={isPending}>Continua</SubmitButton>
         </form>
       )}
 
       {step === "details" && (
         <form action={handleSubmitEntry} className="space-y-4">
-          <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-brass-600">
-            <ShieldCheck size={14} />
-            Email verificata
-          </div>
-
           <Field label="Tipo di foto">
             <div className="flex gap-3">
               <RadioPill name="type" value="SINGLE" label="Singola" defaultChecked />
@@ -173,6 +113,16 @@ export function UploadForm({
               className="block w-full text-sm text-ink-700 file:mr-3 file:rounded-full file:border-0 file:bg-ink-950 file:px-4 file:py-2 file:text-xs file:font-medium file:text-parchment-50"
             />
           </Field>
+
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setStep("email")}
+              className="text-xs text-ink-700 underline"
+            >
+              Cambia email
+            </button>
+          </div>
 
           <SubmitButton pending={isPending}>Pubblica nella Hall of Fame</SubmitButton>
         </form>
@@ -248,7 +198,6 @@ function SubmitButton({
 function Stepper({ step }: { step: Step }) {
   const steps: { key: Step; label: string }[] = [
     { key: "email", label: "Email" },
-    { key: "otp", label: "Codice" },
     { key: "details", label: "Foto" },
   ];
   const activeIndex = steps.findIndex((s) => s.key === step);

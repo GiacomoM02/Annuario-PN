@@ -1,6 +1,8 @@
 import { z } from "zod";
 
-export const sendOtpSchema = z.object({
+// Solo controllo del formato/dominio: nessuna prova che l'utente possieda
+// davvero quell'indirizzo (nessun OTP inviato).
+export const emailDomainSchema = z.object({
   email: z
     .string()
     .email("Inserisci un indirizzo email valido.")
@@ -8,11 +10,6 @@ export const sendOtpSchema = z.object({
       (v) => v.endsWith("@unipi.it") || v.endsWith("@studenti.unipi.it"),
       "Devi usare un'email @unipi.it o @studenti.unipi.it."
     ),
-});
-
-export const verifyOtpSchema = z.object({
-  email: z.string().email(),
-  code: z.string().length(6, "Il codice deve avere 6 cifre."),
 });
 
 export const uploadEntrySchema = z.object({
@@ -25,5 +22,4 @@ export const uploadEntrySchema = z.object({
     .string()
     .min(1, "Aggiungi una didascalia.")
     .max(280, "Didascalia troppo lunga (max 280 caratteri)."),
-  verificationToken: z.string().min(1, "Verifica prima la tua email."),
 });
