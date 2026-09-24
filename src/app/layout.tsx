@@ -1,10 +1,28 @@
-// app/layout.tsx
-
+import type { Metadata } from "next";
+import { Fraunces, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 
-export const metadata = {
-  title: "Annuario PN",
-  description: "Annuario Università di Pisa - Polo Porta Nuova",
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
+  variable: "--font-source-sans",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  title: "Annuario del PN",
+  description:
+    "L'annuario storico del PN: volti, nomi e momenti che rendono unico il nostro polo. Sfoglia le edizioni passate e aggiungi la tua foto alla Hall of Fame.",
 };
 
 export default function RootLayout({
@@ -13,43 +31,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="it">
-      <body>
-        <div className="min-h-screen bg-overlay flex flex-col">
-
-          {/* HEADER INLINE */}
-          <header className="bg-primary text-white shadow-md">
-            <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-              <h1 className="text-xl font-bold tracking-wide">
-                Annuario PN
-              </h1>
-
-              <nav className="space-x-6 text-sm">
-                <a href="#" className="hover:text-accent transition">
-                  Home
-                </a>
-                <a href="#" className="hover:text-accent transition">
-                  Hall of Fame
-                </a>
-                <a href="#" className="hover:text-accent transition">
-                  Archivio
-                </a>
-              </nav>
-            </div>
-          </header>
-
-          {/* CONTENUTO */}
-          <main className="flex-1">
-            {children}
-          </main>
-
-          {/* FOOTER INLINE */}
-          <footer className="bg-primary text-white mt-16">
-            <div className="container mx-auto px-4 py-6 text-center text-sm">
-              © {new Date().getFullYear()} Università di Pisa — Polo Porta Nuova
-            </div>
-          </footer>
-
+    <html lang="it" className={`${fraunces.variable} ${sourceSans.variable}`}>
+      <body className="min-h-screen bg-parchment-50 font-body text-ink-950 antialiased">
+        <div className="pointer-events-none fixed inset-0 z-0 bg-grain" />
+        <div className="relative z-10 flex min-h-screen flex-col">
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
         </div>
       </body>
     </html>

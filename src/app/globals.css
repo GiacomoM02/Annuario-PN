@@ -1,39 +1,28 @@
-/* app/globals.css */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg-image: url("/bg-image.jpg"); /* sostituibile facilmente */
+@layer base {
+  ::selection {
+    @apply bg-brass-400/40;
+  }
+  h1, h2, h3 {
+    @apply font-display;
+  }
+  a {
+    @apply underline-offset-4;
+  }
+  :focus-visible {
+    outline: 2px solid theme("colors.brass.500");
+    outline-offset: 2px;
+  }
 }
 
-body {
-  @apply bg-background text-gray-800;
-  background-image: var(--bg-image);
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-}
-
-/* overlay per leggibilità */
-.bg-overlay {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(4px);
-}
-
-.btn-primary {
-  @apply bg-primary text-white px-6 py-2 rounded-lg font-medium shadow transition;
-}
-
-.btn-primary:hover {
-  @apply bg-primary-light;
-}
-
-.btn-secondary {
-  @apply bg-white text-primary border border-primary px-6 py-2 rounded-lg transition;
-}
-
-.btn-secondary:hover {
-  @apply bg-primary text-white;
+@layer components {
+  .rule {
+    @apply h-px w-full bg-ink-950/10;
+  }
+  .eyebrow {
+    @apply text-xs tracking-wide text-brass-600;
+  }
 }
