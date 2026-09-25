@@ -50,9 +50,9 @@ export function CurrentEditionCard() {
         target="_blank"
         rel="noopener noreferrer"
         download
-        className="mt-4 inline-flex items-center gap-2 rounded-full bg-unipi-500 px-6 py-3 text-sm font-medium text-paper-50 transition hover:bg-unipi-600"
+        className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-unipi-500 px-4 py-2 text-xs font-medium text-paper-50 transition hover:bg-unipi-600"
       >
-        <Download size={16} />
+        <Download size={14} />
         Scarica l'annuario di quest'anno
       </a>
     </div>

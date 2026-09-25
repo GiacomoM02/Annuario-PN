@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, GraduationCap } from "lucide-react";
+import { BookOpen, GraduationCap, Mail, Camera } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { CurrentEditionCard } from "@/components/CurrentEditionCard";
 
@@ -10,83 +10,118 @@ export const dynamic = "force-dynamic";
 
 export default function HomePage() {
   return (
-    <div>
-      {/* Hero con sfondo configurabile: cambia src/config/site.ts */}
+    <div className="lg:grid lg:min-h-[calc(100vh-73px)] lg:grid-cols-2">
+      {/* Colonna sinistra: Hero con sfondo configurabile (src/config/site.ts).
+          L'immagine copre solo questa colonna, non il pannello bianco a destra. */}
       <section
-        className="relative overflow-hidden bg-unipi-700 bg-cover bg-center"
+        className="relative flex items-center overflow-hidden bg-unipi-700 bg-cover bg-center"
         style={{ backgroundImage: `url(${siteConfig.backgroundImageUrl})` }}
       >
         <div
           className="absolute inset-0 bg-unipi-700"
           style={{ opacity: siteConfig.backgroundOverlayOpacity }}
         />
-        <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-16 sm:pt-24">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-unipi-400/40 bg-paper-50/10 px-3 py-1 text-[11px] font-medium text-paper-50">
+        <div className="relative mx-auto w-full max-w-xl px-6 py-14 lg:px-10">
+          {/* Logo Unipi: sostituisci /public/brand/unipi-logo.svg con il
+              logo ufficiale (versione chiara, per contrasto sul blu). */}
+          <img
+            src="/brand/unipi-logo.svg"
+            alt="Università di Pisa"
+            className="h-8 w-auto opacity-95"
+          />
+
+          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-unipi-400/40 bg-paper-50/10 px-3 py-1 text-[11px] font-medium text-paper-50">
             <GraduationCap size={12} />
             Università di Pisa — Polo Porta Nuova
           </div>
 
-          <h1 className="mt-4 max-w-3xl font-display text-5xl font-semibold leading-[1.05] text-paper-50 sm:text-6xl">
+          <h1 className="mt-4 font-display text-3xl font-semibold leading-[1.1] text-paper-50 sm:text-4xl">
             Volti, nomi e momenti che rendono unico{" "}
             <span className="italic text-unipi-400">il nostro polo.</span>
           </h1>
-          <p className="mt-6 max-w-xl text-lg text-paper-100/85">
+          <p className="mt-5 text-base text-paper-100/85 sm:text-lg">
             {siteConfig.name} raccoglie, edizione dopo edizione, chi ha
             abitato questi corridoi. Sfoglia le edizioni passate o aggiungi
             oggi stesso la tua foto alla Hall of Fame.
           </p>
 
-          <div className="mt-10 max-w-xl">
-            <CurrentEditionCard />
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              href="/archivio"
+              className="inline-flex items-center gap-2 rounded-full bg-paper-50 px-6 py-3 text-sm font-semibold text-unipi-700 shadow-sm transition hover:bg-paper-100 sm:text-base"
+            >
+              <BookOpen size={16} />
+              Archivio
+            </Link>
+            <Link
+              href="/hall-of-fame"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-paper-50/70 px-6 py-3 text-sm font-semibold text-paper-50 transition hover:border-paper-50 hover:bg-paper-50/10 sm:text-base"
+            >
+              <GraduationCap size={16} />
+              Hall of Fame
+            </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Colonna destra: box dell'edizione corrente + "Come partecipare",
+          impilati verticalmente, su sfondo bianco semplice. */}
+      <section className="flex items-center bg-paper-50">
+        <div className="mx-auto w-full max-w-xl px-6 py-10 lg:px-10">
+          <CurrentEditionCard />
 
           <Link
             href="/archivio"
-            className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-paper-100/85 underline decoration-unipi-400 underline-offset-4 hover:text-paper-50"
+            className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-ink-700 underline decoration-unipi-400 underline-offset-4 hover:text-unipi-700"
           >
             <BookOpen size={14} />
             Consulta le edizioni passate
           </Link>
-        </div>
-      </section>
 
-      {/* Come funziona */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <p className="eyebrow">Come partecipare</p>
-        <h2 className="mt-2 font-display text-3xl font-semibold text-unipi-700">
-          Due passaggi, due minuti.
-        </h2>
-        <div className="mt-10 grid gap-10 sm:grid-cols-2">
-          <Step
-            n="1"
-            title="Scrivi la tua email istituzionale"
-            body="Deve terminare con @unipi.it o @studenti.unipi.it: è il modo con cui riconosciamo chi fa parte del PN."
-          />
-          <Step
-            n="2"
-            title="Carica la tua foto"
-            body="Singola o di gruppo, con nomi e una didascalia. Compare subito nella Hall of Fame, senza bisogno di ricaricare la pagina."
-          />
+          <div className="mt-8 border-t border-ink-950/10 pt-8">
+            <p className="eyebrow">Come partecipare</p>
+            <h2 className="mt-1 font-display text-xl font-semibold text-unipi-700">
+              Due passaggi, due minuti.
+            </h2>
+            <div className="mt-5 space-y-4">
+              <MiniStep
+                icon={<Mail size={16} />}
+                title="Email istituzionale"
+                body="Deve terminare con @unipi.it o @studenti.unipi.it."
+              />
+              <MiniStep
+                icon={<Camera size={16} />}
+                title="Carica la tua foto"
+                body="Singola o di gruppo: compare subito nella Hall of Fame."
+              />
+            </div>
+          </div>
         </div>
-        <Link
-          href="/hall-of-fame"
-          className="mt-10 inline-flex items-center gap-1.5 text-sm font-medium text-unipi-600 hover:text-unipi-500"
-        >
-          Aggiungi la tua foto ora <ArrowRight size={14} />
-        </Link>
       </section>
     </div>
   );
 }
 
-function Step({ n, title, body }: { n: string; title: string; body: string }) {
+function MiniStep({
+  icon,
+  title,
+  body,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
   return (
-    <div className="border-l-2 border-unipi-500 pl-5">
-      <span className="font-display text-2xl italic text-unipi-600">{n}</span>
-      <h3 className="mt-2 font-display text-lg font-semibold text-ink-950">
-        {title}
-      </h3>
-      <p className="mt-2 text-sm leading-relaxed text-ink-700">{body}</p>
+    <div className="flex gap-3">
+      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-unipi-50 text-unipi-600">
+        {icon}
+      </div>
+      <div>
+        <h3 className="font-display text-sm font-semibold text-ink-950">
+          {title}
+        </h3>
+        <p className="mt-0.5 text-sm leading-snug text-ink-700">{body}</p>
+      </div>
     </div>
   );
 }
