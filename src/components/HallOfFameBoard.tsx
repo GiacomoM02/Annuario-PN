@@ -51,7 +51,7 @@ export function HallOfFameBoard({
         </p>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 rounded-full bg-garnet-500 px-5 py-2.5 text-sm font-medium text-parchment-50 transition hover:bg-garnet-600"
+          className="inline-flex items-center gap-2 rounded-full bg-unipi-500 px-5 py-2.5 text-sm font-medium text-paper-50 transition hover:bg-unipi-600"
         >
           <Plus size={16} />
           Aggiungi la tua foto
@@ -59,7 +59,7 @@ export function HallOfFameBoard({
       </div>
 
       {entries.length === 0 ? (
-        <div className="mt-14 rounded-sm border border-dashed border-ink-950/20 py-20 text-center text-ink-700">
+        <div className="mt-14 rounded-lg border border-dashed border-unipi-200 py-20 text-center text-ink-600">
           Nessuna foto ancora. Sii il primo ad aggiungere la tua.
         </div>
       ) : (

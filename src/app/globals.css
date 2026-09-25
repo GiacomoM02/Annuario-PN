@@ -4,7 +4,7 @@
 
 @layer base {
   ::selection {
-    @apply bg-brass-400/40;
+    @apply bg-unipi-400/40;
   }
   h1, h2, h3 {
     @apply font-display;
@@ -13,7 +13,7 @@
     @apply underline-offset-4;
   }
   :focus-visible {
-    outline: 2px solid theme("colors.brass.500");
+    outline: 2px solid theme("colors.unipi.500");
     outline-offset: 2px;
   }
 }
@@ -23,6 +23,6 @@
     @apply h-px w-full bg-ink-950/10;
   }
   .eyebrow {
-    @apply text-xs tracking-wide text-brass-600;
+    @apply text-xs tracking-wide text-unipi-600;
   }
 }

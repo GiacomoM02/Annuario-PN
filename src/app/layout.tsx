@@ -32,7 +32,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="it" className={`${fraunces.variable} ${sourceSans.variable}`}>
-      <body className="min-h-screen bg-parchment-50 font-body text-ink-950 antialiased">
+      <body className="min-h-screen bg-paper-50 font-body text-ink-950 antialiased">
         <div className="pointer-events-none fixed inset-0 z-0 bg-grain" />
         <div className="relative z-10 flex min-h-screen flex-col">
           <Navbar />

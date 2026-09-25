@@ -12,8 +12,8 @@ function formatDate(date: Date) {
 
 export function PhotoCard({ entry }: { entry: HallOfFameEntry }) {
   return (
-    <article className="group break-inside-avoid overflow-hidden rounded-sm border border-ink-950/10 bg-parchment-100 shadow-sm transition hover:shadow-md">
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-ink-900">
+    <article className="group break-inside-avoid overflow-hidden rounded-lg border border-unipi-100 bg-paper-50 shadow-sm transition hover:-translate-y-0.5 hover:border-unipi-400/40 hover:shadow-md">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-unipi-700">
         <Image
           src={entry.imageUrl}
           alt={entry.caption}
@@ -22,20 +22,20 @@ export function PhotoCard({ entry }: { entry: HallOfFameEntry }) {
           className="object-cover transition duration-300 group-hover:scale-[1.03]"
         />
         {entry.type === "GROUP" && (
-          <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-ink-950/80 px-2.5 py-1 text-[11px] font-medium text-parchment-50">
+          <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-unipi-700/90 px-2.5 py-1 text-[11px] font-medium text-paper-50">
             <Users size={12} />
             Gruppo
           </span>
         )}
       </div>
       <div className="p-4">
-        <h3 className="font-display text-base font-semibold leading-snug text-ink-950">
+        <h3 className="font-display text-base font-semibold leading-snug text-unipi-700">
           {entry.names}
         </h3>
         <p className="mt-1 text-sm leading-snug text-ink-700">
           {entry.caption}
         </p>
-        <p className="mt-2 text-xs text-ink-700/60">
+        <p className="mt-2 text-xs text-ink-500">
           {formatDate(entry.createdAt)}
         </p>
       </div>

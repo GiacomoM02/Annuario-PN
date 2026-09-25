@@ -1,0 +1,7 @@
+Metti qui i file immagine usati dal sito:
+
+- hero-bg.jpg -> sfondo della sezione hero in Home (vedi src/config/site.config.ts)
+- copertine/2026.jpg -> copertina dell'edizione 2026 nell'Archivio (vedi src/config/editions.ts)
+
+Puoi anche usare URL assoluti (es. immagini caricate su Vercel Blob) invece
+di file locali: basta scrivere l'URL completo al posto del percorso "/images/...".

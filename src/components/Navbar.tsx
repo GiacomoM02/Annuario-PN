@@ -8,13 +8,13 @@ const links = [
 
 export function Navbar() {
   return (
-    <header className="border-b border-ink-950/10 bg-parchment-50/90 backdrop-blur">
+    <header className="border-b border-ink-950/10 bg-paper-50/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link href="/" className="group flex items-baseline gap-2">
           <span className="font-display text-lg font-semibold text-ink-900">
             Annuario
           </span>
-          <span className="font-display text-lg italic text-brass-600">
+          <span className="font-display text-lg italic text-unipi-600">
             del PN
           </span>
         </Link>
@@ -23,7 +23,7 @@ export function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm text-ink-800 decoration-brass-500 hover:text-ink-950 hover:underline"
+              className="text-sm text-ink-800 decoration-unipi-500 hover:text-ink-950 hover:underline"
             >
               {link.label}
             </Link>

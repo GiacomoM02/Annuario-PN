@@ -33,7 +33,7 @@ export function UploadModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-parchment-50 p-6 shadow-xl sm:rounded-sm sm:p-8"
+        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-paper-50 p-6 shadow-xl sm:rounded-sm sm:p-8"
       >
         <div className="mb-6 flex items-start justify-between">
           <div>

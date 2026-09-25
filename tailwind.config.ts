@@ -6,28 +6,32 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Ink-and-parchment palette: a university-press yearbook, not a SaaS dashboard.
+        // Identità Unipi: sfondo prevalentemente bianco, accenti e dettagli
+        // in blu/azzurro istituzionale (Cherubino). Nessun rosso: era un
+        // errore della versione precedente, corretto qui.
+        unipi: {
+          50: "#EAF3FA",  // tinta quasi bianca, per sfondi di card/badge
+          100: "#D2E7F5",
+          400: "#4A9FD8", // azzurro chiaro, accenti secondari/hover
+          500: "#0066B2", // azzurro Unipi primario (bottoni, link, badge)
+          600: "#00548F",
+          700: "#002B49", // blu istituzionale scuro (header, footer, testo enfatizzato)
+          900: "#001B30",
+        },
+        // Neutro quasi-nero per il testo, separato dal blu del brand.
         ink: {
-          950: "#101820", // near-black navy ink
-          900: "#16212E",
-          800: "#203041",
-          700: "#2C455C",
-          600: "#3C5A73",
-          500: "#557089",
+          950: "#0A0E14",
+          900: "#12161F",
+          800: "#1C222E",
+          700: "#333B4A",
+          600: "#4B5566",
+          500: "#66707F",
         },
-        parchment: {
-          50: "#FBF8F1",
-          100: "#F4EEDF",
-          200: "#EADFC7",
-        },
-        brass: {
-          400: "#C9A15A",
-          500: "#B08838",
-          600: "#8F6C28",
-        },
-        garnet: {
-          500: "#7C2C3B",
-          600: "#671F2C",
+        // Sfondo bianco-dominante con leggerissima tinta fredda per le card.
+        paper: {
+          50: "#FFFFFF",
+          100: "#F5F8FA",
+          200: "#E3EAEF",
         },
       },
       fontFamily: {

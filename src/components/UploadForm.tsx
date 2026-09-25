@@ -50,7 +50,7 @@ export function UploadForm({
       <Stepper step={step} />
 
       {error && (
-        <p className="mb-4 rounded-sm border border-garnet-500/30 bg-garnet-500/5 px-3 py-2 text-sm text-garnet-600">
+        <p className="mb-4 rounded-sm border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
           {error}
         </p>
       )}
@@ -110,7 +110,7 @@ export function UploadForm({
               name="image"
               accept="image/*"
               required
-              className="block w-full text-sm text-ink-700 file:mr-3 file:rounded-full file:border-0 file:bg-ink-950 file:px-4 file:py-2 file:text-xs file:font-medium file:text-parchment-50"
+              className="block w-full text-sm text-ink-700 file:mr-3 file:rounded-full file:border-0 file:bg-ink-950 file:px-4 file:py-2 file:text-xs file:font-medium file:text-paper-50"
             />
           </Field>
 
@@ -132,7 +132,7 @@ export function UploadForm({
 }
 
 const inputClass =
-  "w-full rounded-sm border border-ink-950/15 bg-parchment-100 px-3 py-2.5 text-sm text-ink-950 outline-none focus:border-brass-500";
+  "w-full rounded-sm border border-ink-950/15 bg-paper-100 px-3 py-2.5 text-sm text-ink-950 outline-none focus:border-unipi-500";
 
 function Field({
   label,
@@ -163,13 +163,13 @@ function RadioPill({
   defaultChecked?: boolean;
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-2 rounded-full border border-ink-950/15 px-4 py-2 text-sm has-[:checked]:border-brass-500 has-[:checked]:bg-brass-400/10">
+    <label className="flex cursor-pointer items-center gap-2 rounded-full border border-ink-950/15 px-4 py-2 text-sm has-[:checked]:border-unipi-500 has-[:checked]:bg-unipi-100">
       <input
         type="radio"
         name={name}
         value={value}
         defaultChecked={defaultChecked}
-        className="accent-brass-500"
+        className="accent-unipi-500"
       />
       {label}
     </label>
@@ -187,7 +187,7 @@ function SubmitButton({
     <button
       type="submit"
       disabled={pending}
-      className="flex w-full items-center justify-center gap-2 rounded-full bg-ink-950 px-6 py-3 text-sm font-medium text-parchment-50 transition hover:bg-ink-900 disabled:opacity-60"
+      className="flex w-full items-center justify-center gap-2 rounded-full bg-unipi-500 px-6 py-3 text-sm font-medium text-paper-50 transition hover:bg-unipi-600 disabled:opacity-60"
     >
       {pending && <Loader2 size={16} className="animate-spin" />}
       {children}
@@ -210,7 +210,7 @@ function Stepper({ step }: { step: Step }) {
             className={cn(
               "flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-medium",
               i <= activeIndex
-                ? "bg-ink-950 text-parchment-50"
+                ? "bg-unipi-500 text-paper-50"
                 : "bg-ink-950/10 text-ink-700"
             )}
           >

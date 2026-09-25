@@ -1,34 +1,12 @@
 import Image from "next/image";
 import { Download, FileText } from "lucide-react";
-import { db, schema } from "@/lib/db";
-import { desc } from "drizzle-orm";
+import { editions } from "@/config/editions";
 
-// Renderizzata a runtime (non in fase di build): evita che "next build" provi
-// a interrogare il database prima che lo schema/le tabelle esistano davvero,
-// ed è comunque presto invalidata da revalidatePath quando cambia l'archivio.
-export const dynamic = "force-dynamic";
-
-async function getEditions() {
-  try {
-    return await db
-      .select()
-      .from(schema.archivedEditions)
-      .orderBy(desc(schema.archivedEditions.year));
-  } catch (err) {
-    // Tabella non ancora creata (schema non applicato con "npm run db:push")
-    // o Postgres non collegato: mostriamo lo stato vuoto invece di crashare.
-    console.error("Impossibile leggere archived_editions:", err);
-    return [];
-  }
-}
-
-export default async function ArchivioPage() {
-  const editions = await getEditions();
-
+export default function ArchivioPage() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
       <p className="eyebrow">Edizioni passate</p>
-      <h1 className="mt-2 font-display text-4xl font-semibold text-ink-950">
+      <h1 className="mt-2 font-display text-4xl font-semibold text-unipi-700">
         Archivio
       </h1>
       <p className="mt-4 max-w-2xl text-ink-700">
@@ -42,45 +20,48 @@ export default async function ArchivioPage() {
         <EmptyState />
       ) : (
         <div className="grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-          {editions.map((edition) => (
-            <article key={edition.id} className="group">
-              <a
-                href={edition.pdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative block aspect-[3/4] overflow-hidden rounded-sm border border-ink-950/10 bg-ink-900 shadow-sm transition group-hover:shadow-md"
-              >
-                <Image
-                  src={edition.coverImageUrl}
-                  alt={`Copertina ${edition.title}`}
-                  fill
-                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover transition duration-300 group-hover:scale-[1.02]"
-                />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink-950/80 to-transparent p-4">
-                  <span className="text-xs font-medium text-parchment-50/90">
-                    Apri la versione digitale
-                  </span>
-                </div>
-              </a>
-              <div className="mt-3 flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="font-display text-lg font-semibold text-ink-950">
-                    {edition.title}
-                  </h2>
-                  <p className="text-sm text-ink-700">{edition.year}</p>
-                </div>
+          {editions
+            .slice()
+            .sort((a, b) => b.year - a.year)
+            .map((edition) => (
+              <article key={edition.year} className="group">
                 <a
                   href={edition.pdfUrl}
-                  download
-                  className="mt-1 flex shrink-0 items-center gap-1.5 text-xs font-medium text-brass-600 hover:text-brass-500"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative block aspect-[3/4] overflow-hidden rounded-lg border border-unipi-100 bg-unipi-700 shadow-sm transition group-hover:shadow-md"
                 >
-                  <Download size={14} />
-                  PDF
+                  <Image
+                    src={edition.coverImageUrl}
+                    alt={`Copertina ${edition.title}`}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition duration-300 group-hover:scale-[1.02]"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-unipi-900/85 to-transparent p-4">
+                    <span className="text-xs font-medium text-paper-50/90">
+                      Apri la versione digitale
+                    </span>
+                  </div>
                 </a>
-              </div>
-            </article>
-          ))}
+                <div className="mt-3 flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="font-display text-lg font-semibold text-ink-950">
+                      {edition.title}
+                    </h2>
+                    <p className="text-sm text-ink-600">{edition.year}</p>
+                  </div>
+                  <a
+                    href={edition.pdfUrl}
+                    download
+                    className="mt-1 flex shrink-0 items-center gap-1.5 text-xs font-medium text-unipi-600 hover:text-unipi-500"
+                  >
+                    <Download size={14} />
+                    PDF
+                  </a>
+                </div>
+              </article>
+            ))}
         </div>
       )}
     </div>
@@ -89,10 +70,11 @@ export default async function ArchivioPage() {
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-sm border border-dashed border-ink-950/20 py-20 text-center">
-      <FileText className="text-ink-700/40" size={32} />
-      <p className="text-ink-700">
-        Le edizioni passate compariranno qui non appena verranno caricate.
+    <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-unipi-200 py-20 text-center">
+      <FileText className="text-ink-500/50" size={32} />
+      <p className="text-ink-600">
+        Le edizioni passate compariranno qui non appena aggiunte a
+        src/config/editions.ts.
       </p>
     </div>
   );
