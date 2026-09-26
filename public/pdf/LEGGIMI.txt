@@ -1,2 +1,0 @@
-Metti qui i PDF delle edizioni dell'annuario, es. annuario-del-pn-2026.pdf,
-e referenziali in src/config/editions.ts come "/pdf/nome-file.pdf".
