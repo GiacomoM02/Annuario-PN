@@ -27,6 +27,22 @@ const config: Config = {
           600: "#4B5566",
           500: "#66707F",
         },
+        // Palette della home (colonna sinistra, navbar e barra sulla foto).
+        // I valori veri stanno in src/app/globals.css (:root, --hero-*):
+        // cambiarli lì aggiorna tutta la home in un colpo solo.
+        hero: {
+          fg: "rgb(var(--hero-fg) / <alpha-value>)",
+          accent: {
+            DEFAULT: "rgb(var(--hero-accent) / <alpha-value>)",
+            deep: "rgb(var(--hero-accent-deep) / <alpha-value>)",
+          },
+          ink: "rgb(var(--hero-ink) / <alpha-value>)",
+          cream: "rgb(var(--hero-cream) / <alpha-value>)",
+          band: {
+            DEFAULT: "rgb(var(--hero-band) / <alpha-value>)",
+            fg: "rgb(var(--hero-band-fg) / <alpha-value>)",
+          },
+        },
         // Sfondo bianco-dominante con leggerissima tinta fredda per le card.
         paper: {
           50: "#FFFFFF",

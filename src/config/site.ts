@@ -8,7 +8,7 @@
  * /public/backgrounds/current.jpg se si preferisce non usare una env var.
  *
  * Se non viene fornita nessuna delle due, si ricade su un colore di
- * sfondo pieno (bianco), così il sito resta corretto anche senza foto.
+ * sfondo pieno (blu inchiostro), così il sito resta corretto anche senza foto.
  */
 export const siteConfig = {
   name: "Annuario del PN",

@@ -3,6 +3,20 @@
 @tailwind utilities;
 
 @layer base {
+  /* Palette della home: colonna sinistra bianca, testo blu Unipi e accenti
+     nell'azzurro Unipi, lo stesso usato per l'alone in fondo alla foto.
+     Valori come canali RGB, così Tailwind può applicare l'opacità. */
+  :root {
+    --hero-fg: 0 43 73; /* testo sulla colonna sinistra (blu Unipi) */
+    --hero-accent: 74 159 216; /* azzurro chiaro (#4A9FD8): corsivo del titolo */
+    --hero-accent-deep: 0 102 178; /* azzurro pieno (#0066B2): "del PN", etichette e icone piccole, più leggibili */
+    --hero-ink: 26 37 46; /* tono scuro: pillola Home sopra la foto */
+    --hero-cream: 243 236 224; /* testo chiaro su fondi scuri */
+    --hero-band: var(--hero-accent); /* alone in fondo alla foto: stesso azzurro del corsivo */
+    --hero-band-fg: 0 43 73; /* testo e bottone sopra l'alone */
+    --hero-panel-bg: #ffffff; /* fondo della colonna sinistra */
+  }
+
   ::selection {
     @apply bg-unipi-400/40;
   }
@@ -21,6 +35,10 @@
 @layer components {
   .rule {
     @apply h-px w-full bg-ink-950/10;
+  }
+  /* Fondo della colonna sinistra in home (vedi --hero-panel-bg). */
+  .hero-panel {
+    background: var(--hero-panel-bg);
   }
   .eyebrow {
     @apply text-xs tracking-wide text-unipi-600;
