@@ -17,8 +17,14 @@ export const siteConfig = {
   // 1) NEXT_PUBLIC_BACKGROUND_IMAGE_URL se impostata (es. un URL Vercel Blob)
   // 2) altrimenti /backgrounds/current.jpg, se il file è stato caricato in public/
   // 3) altrimenti nessuno sfondo fotografico (solo il colore di base)
-  backgroundImageUrl:
-    process.env.NEXT_PUBLIC_BACKGROUND_IMAGE_URL || "/backgrounds/current.jpg",
+  //
+  // Il "?v=..." finale è cache-busting automatico: Vercel imposta da solo
+  // VERCEL_GIT_COMMIT_SHA ad ogni deploy, quindi ogni nuovo commit cambia
+  // l'URL e forza browser/CDN a scaricare la foto aggiornata invece di
+  // mostrare quella vecchia rimasta in cache con lo stesso nome file.
+  backgroundImageUrl: `${
+    process.env.NEXT_PUBLIC_BACKGROUND_IMAGE_URL || "/backgrounds/current.jpg"
+  }?v=${process.env.VERCEL_GIT_COMMIT_SHA || Date.now()}`,
 
   // Overlay sopra la foto di sfondo, per mantenere leggibile il testo
   // sopra qualsiasi immagine venga caricata, senza però "spegnere" la

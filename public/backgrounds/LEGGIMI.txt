@@ -1,0 +1,8 @@
+Il file deve chiamarsi ESATTAMENTE current.jpg (minuscolo, estensione .jpg).
+
+Se la tua foto è .png o .jpeg, rinominala in current.jpg prima di metterla
+qui, oppure aggiorna il percorso in src/config/site.ts (backgroundImageUrl).
+
+Dopo aver sostituito il file: git add . && git commit -m "sfondo" && git push
+Il sito ora aggiunge da solo un parametro di versione all'URL dell'immagine
+ad ogni deploy, quindi non serve svuotare la cache del browser a mano.

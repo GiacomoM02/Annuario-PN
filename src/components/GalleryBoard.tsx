@@ -8,6 +8,7 @@ import {
   getLatestEntriesAction,
   type GallerySection,
 } from "@/lib/gallery-actions";
+import { sortEntriesBySurname } from "@/lib/sort-entries";
 import type { HallOfFameEntry } from "../../drizzle/schema";
 
 const POLL_INTERVAL_MS = 15000;
@@ -39,7 +40,7 @@ export function GalleryBoard({
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const latest = await getLatestEntriesAction(section);
+        const latest = sortEntriesBySurname(await getLatestEntriesAction(section));
         setEntries(latest);
         knownIds.current = new Set(latest.map((e) => e.id));
       } catch {

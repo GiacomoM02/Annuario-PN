@@ -27,12 +27,19 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-unipi-900/85 via-unipi-900/35 to-transparent" />
         <div className="relative mx-auto w-full max-w-xl px-6 py-14 lg:px-10">
+          {/* Emblema "Annuario del PN" (Cherubino), sopra il logo testuale. */}
+          <img
+            src="/brand/cherubino-annuario.jpg"
+            alt="Annuario del PN"
+            className="h-16 w-16 rounded-full shadow-sm sm:h-20 sm:w-20"
+          />
+
           {/* Logo Unipi: sostituisci /public/brand/unipi-logo.svg con il
               logo ufficiale (versione chiara, per contrasto sul blu). */}
           <img
             src="/brand/unipi-logo.svg"
             alt="Università di Pisa"
-            className="h-8 w-auto opacity-95"
+            className="mt-3 h-8 w-auto opacity-95"
           />
 
           <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-unipi-400/40 bg-paper-50/10 px-3 py-1 text-[11px] font-medium text-paper-50">

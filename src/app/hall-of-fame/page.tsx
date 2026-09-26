@@ -1,6 +1,7 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { GalleryBoard } from "@/components/GalleryBoard";
+import { sortEntriesBySurname } from "@/lib/sort-entries";
 
 export const dynamic = "force-dynamic"; // sempre dati freschi: pagina "viva"
 
@@ -24,7 +25,9 @@ async function getInitialEntries() {
 }
 
 export default async function HallOfFamePage() {
-  const entries = await getInitialEntries();
+  // Selezione per recenza (le 60 più nuove), ma mostrate in ordine
+  // alfabetico per cognome.
+  const entries = sortEntriesBySurname(await getInitialEntries());
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
