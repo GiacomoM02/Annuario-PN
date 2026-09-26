@@ -11,8 +11,42 @@ export const dynamic = "force-dynamic";
 export default function HomePage() {
   return (
     <div className="lg:grid lg:min-h-[calc(100vh-73px)] lg:grid-cols-2">
-      {/* Colonna sinistra: Hero con sfondo configurabile (src/config/site.ts).
-          L'immagine copre solo questa colonna, non il pannello bianco a destra. */}
+      {/* Colonna sinistra: box dell'edizione corrente + "Come partecipare",
+          impilati verticalmente, su sfondo bianco semplice. */}
+      <section className="flex items-center bg-paper-50">
+        <div className="mx-auto w-full max-w-xl px-6 py-10 lg:px-10">
+          <CurrentEditionCard />
+
+          <Link
+            href="/archivio"
+            className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-ink-700 underline decoration-unipi-400 underline-offset-4 hover:text-unipi-700"
+          >
+            <BookOpen size={14} />
+            Consulta le edizioni passate
+          </Link>
+
+          <div className="mt-8 border-t border-ink-950/10 pt-8">
+            <p className="eyebrow">Come partecipare</p>
+            <h2 className="mt-1 font-display text-xl font-semibold text-unipi-700">
+              Due passaggi, due minuti.
+            </h2>
+            <div className="mt-5 space-y-4">
+              <MiniStep
+                icon={<Mail size={16} />}
+                title="Email istituzionale"
+                body="Deve terminare con @unipi.it o @studenti.unipi.it."
+              />
+              <MiniStep
+                icon={<Camera size={16} />}
+                title="Carica la tua foto"
+                body="Singola o di gruppo: compare subito nella Hall of Fame."
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* Colonna destra: Hero con sfondo configurabile (src/config/site.ts).
+          L'immagine copre solo questa colonna, non il pannello bianco a sinistra. */}
       <section
         className="relative flex items-center overflow-hidden bg-unipi-700 bg-cover bg-center"
         style={{ backgroundImage: `url(${siteConfig.backgroundImageUrl})` }}
@@ -83,40 +117,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Colonna destra: box dell'edizione corrente + "Come partecipare",
-          impilati verticalmente, su sfondo bianco semplice. */}
-      <section className="flex items-center bg-paper-50">
-        <div className="mx-auto w-full max-w-xl px-6 py-10 lg:px-10">
-          <CurrentEditionCard />
-
-          <Link
-            href="/archivio"
-            className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-ink-700 underline decoration-unipi-400 underline-offset-4 hover:text-unipi-700"
-          >
-            <BookOpen size={14} />
-            Consulta le edizioni passate
-          </Link>
-
-          <div className="mt-8 border-t border-ink-950/10 pt-8">
-            <p className="eyebrow">Come partecipare</p>
-            <h2 className="mt-1 font-display text-xl font-semibold text-unipi-700">
-              Due passaggi, due minuti.
-            </h2>
-            <div className="mt-5 space-y-4">
-              <MiniStep
-                icon={<Mail size={16} />}
-                title="Email istituzionale"
-                body="Deve terminare con @unipi.it o @studenti.unipi.it."
-              />
-              <MiniStep
-                icon={<Camera size={16} />}
-                title="Carica la tua foto"
-                body="Singola o di gruppo: compare subito nella Hall of Fame."
-              />
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
