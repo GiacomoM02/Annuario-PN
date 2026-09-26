@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, GraduationCap, Mail, Camera } from "lucide-react";
+import { BookOpen, GraduationCap, Mail, Camera, ScrollText } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { CurrentEditionCard } from "@/components/CurrentEditionCard";
 
@@ -17,10 +17,15 @@ export default function HomePage() {
         className="relative flex items-center overflow-hidden bg-unipi-700 bg-cover bg-center"
         style={{ backgroundImage: `url(${siteConfig.backgroundImageUrl})` }}
       >
+        {/* Overlay in due livelli: una tinta uniforme leggera (config-
+            controllata) così la foto resta nitida, più un gradiente più
+            scuro verso il basso/sinistra, dove sta il testo, per garantirne
+            la leggibilità senza "spegnere" l'immagine nel resto dell'area. */}
         <div
-          className="absolute inset-0 bg-unipi-700"
+          className="absolute inset-0 bg-unipi-900"
           style={{ opacity: siteConfig.backgroundOverlayOpacity }}
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-unipi-900/85 via-unipi-900/35 to-transparent" />
         <div className="relative mx-auto w-full max-w-xl px-6 py-14 lg:px-10">
           {/* Logo Unipi: sostituisci /public/brand/unipi-logo.svg con il
               logo ufficiale (versione chiara, per contrasto sul blu). */}
@@ -48,7 +53,7 @@ export default function HomePage() {
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
               href="/archivio"
-              className="inline-flex items-center gap-2 rounded-full bg-paper-50 px-6 py-3 text-sm font-semibold text-unipi-700 shadow-sm transition hover:bg-paper-100 sm:text-base"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-paper-50/70 px-6 py-3 text-sm font-semibold text-paper-50 transition hover:border-paper-50 hover:bg-paper-50/10 sm:text-base"
             >
               <BookOpen size={16} />
               Archivio
@@ -59,6 +64,13 @@ export default function HomePage() {
             >
               <GraduationCap size={16} />
               Hall of Fame
+            </Link>
+            <Link
+              href="/annuario-storico"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-paper-50/70 px-6 py-3 text-sm font-semibold text-paper-50 transition hover:border-paper-50 hover:bg-paper-50/10 sm:text-base"
+            >
+              <ScrollText size={16} />
+              Annuario Storico
             </Link>
           </div>
         </div>

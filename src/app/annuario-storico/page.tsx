@@ -11,37 +11,38 @@ async function getInitialEntries() {
       .from(schema.hallOfFameEntries)
       .where(
         and(
-          eq(schema.hallOfFameEntries.section, "HALL_OF_FAME"),
+          eq(schema.hallOfFameEntries.section, "ANNUARIO_STORICO"),
           eq(schema.hallOfFameEntries.status, "APPROVED")
         )
       )
       .orderBy(desc(schema.hallOfFameEntries.createdAt))
       .limit(60);
   } catch (err) {
-    console.error("Impossibile leggere hall_of_fame_entries:", err);
+    console.error("Impossibile leggere hall_of_fame_entries (storico):", err);
     return [];
   }
 }
 
-export default async function HallOfFamePage() {
+export default async function AnnuarioStoricoPage() {
   const entries = await getInitialEntries();
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
-      <p className="eyebrow">Galleria dei laureandi</p>
+      <p className="eyebrow">Ricordi da tutte le edizioni</p>
       <h1 className="mt-2 font-display text-4xl font-semibold text-unipi-700">
-        Hall of Fame
+        Annuario Storico
       </h1>
       <p className="mt-4 max-w-2xl text-ink-700">
-        Ogni scheda porta il nome di chi l'ha abitato, il PN. Aggiungi la
-        tua: bastano un'email istituzionale, una foto e una didascalia.
+        Una galleria a parte, senza vincoli di edizione: foto, gruppi e
+        momenti del PN nel tempo. Aggiungi la tua: bastano un'email
+        istituzionale, una foto e una didascalia.
       </p>
 
       <GalleryBoard
-        section="HALL_OF_FAME"
+        section="ANNUARIO_STORICO"
         initialEntries={entries}
-        modalEyebrow="Hall of Fame"
-        submitLabel="Pubblica nella Hall of Fame"
+        modalEyebrow="Annuario Storico"
+        submitLabel="Pubblica nell'Annuario Storico"
       />
     </div>
   );

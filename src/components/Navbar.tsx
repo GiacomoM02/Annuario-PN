@@ -1,10 +1,6 @@
 import Link from "next/link";
 
-const links = [
-  { href: "/", label: "Home" },
-  { href: "/archivio", label: "Archivio" },
-  { href: "/hall-of-fame", label: "Hall of Fame" },
-];
+const links = [{ href: "/", label: "Home" }];
 
 export function Navbar() {
   return (

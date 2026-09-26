@@ -3,13 +3,20 @@
 import { useEffect } from "react";
 import { X } from "lucide-react";
 import { UploadForm } from "@/components/UploadForm";
+import type { GallerySection } from "@/lib/gallery-actions";
 import type { HallOfFameEntry } from "../../drizzle/schema";
 
 export function UploadModal({
+  section,
+  eyebrow,
+  submitLabel,
   open,
   onClose,
   onUploaded,
 }: {
+  section: GallerySection;
+  eyebrow: string;
+  submitLabel: string;
   open: boolean;
   onClose: () => void;
   onUploaded: (entry: HallOfFameEntry) => void;
@@ -37,7 +44,7 @@ export function UploadModal({
       >
         <div className="mb-6 flex items-start justify-between">
           <div>
-            <p className="eyebrow">Hall of Fame</p>
+            <p className="eyebrow">{eyebrow}</p>
             <h2 className="mt-1 font-display text-xl font-semibold text-ink-950">
               Aggiungi la tua foto
             </h2>
@@ -50,7 +57,11 @@ export function UploadModal({
             <X size={18} />
           </button>
         </div>
-        <UploadForm onUploaded={onUploaded} />
+        <UploadForm
+          section={section}
+          submitLabel={submitLabel}
+          onUploaded={onUploaded}
+        />
       </div>
     </div>
   );

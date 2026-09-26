@@ -1,25 +1,34 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import {
   checkEmailDomainAction,
-  createEntryAction,
-} from "@/app/hall-of-fame/actions";
+  createGalleryEntryAction,
+  type GallerySection,
+} from "@/lib/gallery-actions";
+import { facultyOptions } from "@/lib/faculties";
 import { cn } from "@/lib/utils";
 import type { HallOfFameEntry } from "../../drizzle/schema";
 
-type Step = "email" | "details";
+type Step = "email" | "details" | "success";
+type PhotoType = "SINGLE" | "GROUP";
 
 export function UploadForm({
+  section,
+  submitLabel = "Pubblica",
   onUploaded,
 }: {
+  section: GallerySection;
+  submitLabel?: string;
   onUploaded: (entry: HallOfFameEntry) => void;
 }) {
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
+  const [photoType, setPhotoType] = useState<PhotoType>("SINGLE");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [lastEntry, setLastEntry] = useState<HallOfFameEntry | null>(null);
 
   // --- Step 1: controlla che l'email sia @unipi.it / @studenti.unipi.it ---
   // Nessun codice inviato: solo un controllo di formato, non una vera prova
@@ -34,20 +43,24 @@ export function UploadForm({
     });
   }
 
-  // --- Step 2: dettagli foto + upload -------------------------------------
+  // --- Step 2: dettagli foto + upload, sulla sezione (Hall of Fame o
+  // Annuario Storico) passata da chi usa questo form. La scheda nasce
+  // sempre in moderazione (status PENDING): non appare subito nella
+  // galleria, quindi qui mostriamo solo un messaggio di conferma. --------
   function handleSubmitEntry(formData: FormData) {
     setError(null);
     formData.set("email", email);
     startTransition(async () => {
-      const result = await createEntryAction(formData);
+      const result = await createGalleryEntryAction(section, formData);
       if (!result.ok) return setError(result.error);
-      onUploaded(result.data);
+      setLastEntry(result.data);
+      setStep("success");
     });
   }
 
   return (
     <div>
-      <Stepper step={step} />
+      {step !== "success" && <Stepper step={step} />}
 
       {error && (
         <p className="mb-4 rounded-sm border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -78,10 +91,37 @@ export function UploadForm({
         <form action={handleSubmitEntry} className="space-y-4">
           <Field label="Tipo di foto">
             <div className="flex gap-3">
-              <RadioPill name="type" value="SINGLE" label="Singola" defaultChecked />
-              <RadioPill name="type" value="GROUP" label="Gruppo" />
+              <RadioPill
+                name="type"
+                value="SINGLE"
+                label="Singola"
+                checked={photoType === "SINGLE"}
+                onChange={() => setPhotoType("SINGLE")}
+              />
+              <RadioPill
+                name="type"
+                value="GROUP"
+                label="Gruppo"
+                checked={photoType === "GROUP"}
+                onChange={() => setPhotoType("GROUP")}
+              />
             </div>
           </Field>
+
+          {photoType === "SINGLE" && (
+            <Field label="Facoltà">
+              <select name="faculty" required defaultValue="" className={inputClass}>
+                <option value="" disabled>
+                  Seleziona la tua facoltà
+                </option>
+                {facultyOptions.map((f) => (
+                  <option key={f.value} value={f.value}>
+                    {f.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          )}
 
           <Field label="Nome e cognome (per la foto di gruppo, elenca tutti)">
             <textarea
@@ -124,8 +164,29 @@ export function UploadForm({
             </button>
           </div>
 
-          <SubmitButton pending={isPending}>Pubblica nella Hall of Fame</SubmitButton>
+          <SubmitButton pending={isPending}>{submitLabel}</SubmitButton>
         </form>
+      )}
+
+      {step === "success" && lastEntry && (
+        <div className="flex flex-col items-center gap-3 py-6 text-center">
+          <CheckCircle2 className="text-unipi-500" size={36} />
+          <h3 className="font-display text-lg font-semibold text-ink-950">
+            Foto inviata!
+          </h3>
+          <p className="max-w-sm text-sm text-ink-700">
+            Grazie {lastEntry.names.split(",")[0]}. La tua foto è in attesa di
+            approvazione: comparirà nella galleria non appena il team l'avrà
+            verificata.
+          </p>
+          <button
+            type="button"
+            onClick={() => onUploaded(lastEntry)}
+            className="mt-2 rounded-full bg-unipi-500 px-6 py-2.5 text-sm font-medium text-paper-50 transition hover:bg-unipi-600"
+          >
+            Fatto
+          </button>
+        </div>
       )}
     </div>
   );
@@ -155,12 +216,14 @@ function RadioPill({
   name,
   value,
   label,
-  defaultChecked,
+  checked,
+  onChange,
 }: {
   name: string;
   value: string;
   label: string;
-  defaultChecked?: boolean;
+  checked: boolean;
+  onChange: () => void;
 }) {
   return (
     <label className="flex cursor-pointer items-center gap-2 rounded-full border border-ink-950/15 px-4 py-2 text-sm has-[:checked]:border-unipi-500 has-[:checked]:bg-unipi-100">
@@ -168,7 +231,8 @@ function RadioPill({
         type="radio"
         name={name}
         value={value}
-        defaultChecked={defaultChecked}
+        checked={checked}
+        onChange={onChange}
         className="accent-unipi-500"
       />
       {label}
