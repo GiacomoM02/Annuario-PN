@@ -25,10 +25,4 @@ export const siteConfig = {
   backgroundImageUrl: `${
     process.env.NEXT_PUBLIC_BACKGROUND_IMAGE_URL || "/backgrounds/current.jpg"
   }?v=${process.env.VERCEL_GIT_COMMIT_SHA || Date.now()}`,
-
-  // Overlay sopra la foto di sfondo, per mantenere leggibile il testo
-  // sopra qualsiasi immagine venga caricata, senza però "spegnere" la
-  // foto. Valore 0-1, usato come base: la Hero applica sopra anche un
-  // gradiente (più scuro dove c'è testo, più chiaro altrove).
-  backgroundOverlayOpacity: 0.45,
 };
