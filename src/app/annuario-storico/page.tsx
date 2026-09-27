@@ -31,14 +31,14 @@ export default async function AnnuarioStoricoPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
-      <p className="eyebrow">Ricordi da tutte le edizioni</p>
+      <p className="eyebrow">Sempre aperto</p>
       <h1 className="mt-2 font-display text-4xl font-semibold text-unipi-700">
         Annuario Storico
       </h1>
       <p className="mt-4 max-w-2xl text-ink-700">
-        Una galleria a parte, senza vincoli di edizione: foto, gruppi e
-        momenti del PN nel tempo. Aggiungi la tua: bastano un'email
-        istituzionale, una foto e una didascalia.
+        Frequenti il PN da tempo ma non hai mai mandato la tua foto per
+        l'annuario? Qui puoi farlo in qualsiasi momento: la tua foto, la tua
+        facoltà e il tuo nome. Bastano un'email istituzionale e una foto.
       </p>
 
       <GalleryBoard

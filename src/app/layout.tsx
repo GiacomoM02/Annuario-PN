@@ -35,6 +35,12 @@ export default function RootLayout({
       <body className="min-h-screen bg-paper-50 font-body text-ink-950 antialiased">
         <div className="pointer-events-none fixed inset-0 z-0 bg-grain" />
         <div className="relative z-10 flex min-h-screen flex-col">
+          {/* Linea blu Unipi in cima a ogni pagina. Assoluta, così non
+              aggiunge altezza e la hero della home resta in una schermata. */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 z-30 h-[3px] bg-unipi-700"
+          />
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />

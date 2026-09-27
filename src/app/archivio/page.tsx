@@ -1,8 +1,25 @@
 import Image from "next/image";
 import { Download, FileText } from "lucide-react";
 import { editions } from "@/config/editions";
+import { currentEditionConfig, isSubmissionOpen } from "@/config/current-edition";
+import { EditionSubmitCard } from "@/components/EditionSubmitCard";
+
+// Le date della finestra di invio cambiano nel tempo: pagina dinamica, così
+// il riquadro per mandare le foto compare e sparisce da solo.
+export const dynamic = "force-dynamic";
+
+function formatDate(iso: string) {
+  return new Intl.DateTimeFormat("it-IT", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(iso));
+}
 
 export default function ArchivioPage() {
+  const { year, submissionsCloseAt, maxSinglePerPerson, maxGroupPerPerson } =
+    currentEditionConfig;
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
       <p className="eyebrow">Edizioni passate</p>
@@ -13,6 +30,17 @@ export default function ArchivioPage() {
         Sfoglia la versione digitale di ogni edizione dell'Annuario del PN,
         oppure scarica il PDF originale per consultarlo offline o stamparlo.
       </p>
+
+      {isSubmissionOpen() && (
+        <div id="invia" className="mt-10 scroll-mt-24">
+          <EditionSubmitCard
+            year={year}
+            closesOn={formatDate(submissionsCloseAt)}
+            maxSingle={maxSinglePerPerson}
+            maxGroup={maxGroupPerPerson}
+          />
+        </div>
+      )}
 
       <div id="download" className="rule my-12" />
 

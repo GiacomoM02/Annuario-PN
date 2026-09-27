@@ -1,18 +1,26 @@
 /**
  * scripts/generate-pdf.js
  *
- * Genera il PDF dell'Annuario raccogliendo le foto APPROVATE dal database,
- * con lo stesso stile a griglia dell'edizione storica: foto, icona della
- * facoltà in alto a destra (o badge "Gruppo"), nome e didascalia sotto.
- * Le persone sono ordinate alfabeticamente per cognome.
+ * Genera il PDF dell'Annuario di un'edizione raccogliendo le foto APPROVATE
+ * inviate dalla pagina Archivio (sezione ARCHIVIO), con lo stesso template
+ * della prima edizione (public/pdf/annuario-del-pn-2026.pdf):
+ * - copertina bianca con titolo, emblema e sottotitolo;
+ * - pagina 1 con la premessa (facoltativa) e la legenda delle facoltà;
+ * - foto singole in griglia 3x3, ordinate per cognome: foto quadrata, icona
+ *   della facoltà, nome su due righe e frase in un'etichetta blu;
+ * - foto di gruppo, tre per pagina e sfalsate, con la didascalia sotto;
+ * - ogni pagina incorniciata, con l'emblema in alto e il numero in basso.
  *
  * Uso:
- *   node scripts/generate-pdf.js
- *   node scripts/generate-pdf.js --section=ANNUARIO_STORICO
- *   node scripts/generate-pdf.js --section=HALL_OF_FAME --out=output/mio-file.pdf
+ *   npm run generate:pdf
+ *   npm run generate:pdf -- --year=2027
+ *   npm run generate:pdf -- --year=2027 --subtitle="Seconda edizione" --out=output/prova.pdf
+ *
+ * Premessa: se esiste il file content/premessa-<anno>.txt, il suo testo va
+ * in pagina 1 (un paragrafo per blocco di righe, separati da una riga vuota).
  *
  * Richiede POSTGRES_URL in .env.local (lo stesso usato dal sito) e la
- * dipendenza "puppeteer" (vedi package.json / istruzioni finali).
+ * dipendenza "puppeteer".
  */
 
 require("dotenv").config({ path: ".env.local" });
@@ -26,10 +34,10 @@ const { sql } = require("@vercel/postgres");
 // -----------------------------------------------------------------------
 const FACULTIES = {
   MEDICINA: { label: "Medicina, Farmacia, Infermieristica, Psicologia", icon: "MEDICINA.png" },
-  INGEGNERIA: { label: "Ingegneria", icon: "INGEGNERIA.png" },
-  UMANISTICHE: { label: "Discipline umanistiche", icon: "UMANISTICHE.png" },
   SCIENZE: { label: "Scienze matematiche, informatiche, fisiche e della natura", icon: "SCIENZE.png" },
-  PERSONALE: { label: "Personale universitario", icon: "PERSONALE.png" },
+  INGEGNERIA: { label: "Ingegneria", icon: "INGEGNERIA.png" },
+  PERSONALE: { label: "Personale universitario (portineria, bar, ecc.)", icon: "PERSONALE.png" },
+  UMANISTICHE: { label: "Discipline umanistiche", icon: "UMANISTICHE.png" },
 };
 
 const PROJECT_ROOT = path.resolve(__dirname, "..");
@@ -40,100 +48,132 @@ const PROJECT_ROOT = path.resolve(__dirname, "..");
 function parseArgs() {
   const args = Object.fromEntries(
     process.argv.slice(2).map((a) => {
-      const [k, v] = a.replace(/^--/, "").split("=");
-      return [k, v ?? true];
+      const [k, ...v] = a.replace(/^--/, "").split("=");
+      return [k, v.length ? v.join("=") : true];
     })
   );
+  const year = Number(args.year || getConfiguredYear());
   return {
-    section: args.section || "HALL_OF_FAME", // o ANNUARIO_STORICO
-    year: args.year || null,
+    year,
+    subtitle: args.subtitle || `Edizione ${year}`,
     out: args.out || null,
   };
 }
 
 // -----------------------------------------------------------------------
-// Estrae il cognome (ultima parola del primo nome elencato) per ordinare.
-// Stessa logica di src/lib/sort-entries.ts, duplicata per lo stesso motivo.
+// Nome e cognome: il cognome è l'ultima parola più le eventuali particelle
+// ("Del Valle", "Di Giovannantonio"). Stessa logica di
+// src/lib/sort-entries.ts, duplicata per lo stesso motivo delle facoltà.
 // -----------------------------------------------------------------------
+const SURNAME_PARTICLES = new Set([
+  "da", "dal", "dalla", "dalle", "de", "dei", "degli", "del", "della",
+  "delle", "dello", "di", "la", "lo", "le", "li", "van", "von", "der",
+]);
+
+function splitName(fullName) {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length < 2) return { given: fullName.trim(), surname: "" };
+  let start = parts.length - 1;
+  while (start > 1 && SURNAME_PARTICLES.has(parts[start - 1].toLowerCase())) {
+    start--;
+  }
+  return { given: parts.slice(0, start).join(" "), surname: parts.slice(start).join(" ") };
+}
+
 function extractSurname(names) {
   const firstPerson = (names.split(",")[0] || "").trim();
-  const parts = firstPerson.split(/\s+/).filter(Boolean);
-  return parts.length > 0 ? parts[parts.length - 1] : firstPerson;
+  return splitName(firstPerson).surname || firstPerson;
 }
 
 function fileToDataUri(absPath) {
-  const ext = path.extname(absPath).slice(1);
+  const ext = path.extname(absPath).slice(1).toLowerCase();
   const mime = ext === "svg" ? "image/svg+xml" : `image/${ext === "jpg" ? "jpeg" : ext}`;
   const data = fs.readFileSync(absPath).toString("base64");
   return `data:${mime};base64,${data}`;
 }
 
 function escapeHtml(str) {
-  return String(str)
+  return String(str ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
 
-function formatDate(date) {
-  return new Intl.DateTimeFormat("it-IT", { day: "numeric", month: "long", year: "numeric" }).format(
-    new Date(date)
-  );
+function chunk(list, size) {
+  const out = [];
+  for (let i = 0; i < list.length; i += size) out.push(list.slice(i, i + size));
+  return out;
 }
 
 // -----------------------------------------------------------------------
-// HTML: pagina di copertina + griglia 3x3 delle schede, stesso linguaggio
-// visivo del sito (palette Unipi, card bianche, emblema Cherubino).
+// HTML
 // -----------------------------------------------------------------------
-function buildHtml({ entries, year, sectionLabel, cherubinoDataUri, facultyIcons }) {
-  const PER_PAGE = 9; // 3 colonne x 3 righe, come le pagine dell'edizione storica
-  const pages = [];
-  for (let i = 0; i < entries.length; i += PER_PAGE) {
-    pages.push(entries.slice(i, i + PER_PAGE));
-  }
+function buildHtml({ singles, groups, subtitle, premessa, emblem, facultyIcons }) {
+  // Pagina con cornice, emblema in alto e numero in basso (a sinistra sulle
+  // pagine dispari, a destra sulle pari, come nella prima edizione).
+  const framedPage = (number, inner, extraClass = "") => `
+    <section class="page framed ${number % 2 === 1 ? "odd" : "even"} ${extraClass}">
+      <div class="frame"></div>
+      <img class="frame-emblem" src="${emblem}" alt="" />
+      <div class="content">${inner}</div>
+      <div class="page-number">${number}</div>
+    </section>`;
 
-  const cardHtml = (entry) => {
-    const badge =
-      entry.type === "GROUP"
-        ? `<span class="badge badge-group">Gruppo</span>`
-        : entry.faculty && facultyIcons[entry.faculty]
-        ? `<span class="badge badge-faculty"><img src="${facultyIcons[entry.faculty]}" alt="${escapeHtml(
-            (FACULTIES[entry.faculty] || {}).label || ""
-          )}" /></span>`
-        : "";
+  const legend = `
+    <div class="legend">
+      <h2>Leggenda area disciplinare</h2>
+      <div class="legend-grid">
+        ${Object.entries(FACULTIES)
+          .map(
+            ([key, f]) => `
+          <div class="legend-item">
+            ${facultyIcons[key] ? `<img src="${facultyIcons[key]}" alt="" />` : ""}
+            <span>${escapeHtml(f.label)}</span>
+          </div>`
+          )
+          .join("")}
+      </div>
+    </div>`;
 
+  const intro = `
+    ${
+      premessa
+        ? `<div class="premessa"><h1>Premessa</h1>${premessa
+            .split(/\n\s*\n/)
+            .map((p) => `<p>${escapeHtml(p.trim()).replace(/\n/g, "<br/>")}</p>`)
+            .join("")}</div>`
+        : ""
+    }
+    ${legend}`;
+
+  const singleCard = (entry) => {
+    const { given, surname } = splitName(entry.names);
+    const icon = facultyIcons[entry.faculty];
     return `
-      <article class="card">
-        <div class="card-photo">
-          <img src="${entry.imageUrl}" alt="${escapeHtml(entry.caption)}" />
-          ${badge}
+      <article class="single">
+        <div class="single-photo">
+          <img class="photo" src="${entry.imageUrl}" alt="" />
+          ${icon ? `<img class="faculty" src="${icon}" alt="" />` : ""}
         </div>
-        <div class="card-body">
-          <h3>${escapeHtml(entry.names)}</h3>
-          <p>${escapeHtml(entry.caption)}</p>
-        </div>
+        <div class="single-name"><span>${escapeHtml(given)}</span><span>${escapeHtml(surname)}</span></div>
+        <div class="single-motto">${escapeHtml(entry.caption)}</div>
       </article>`;
   };
 
-  const pageHeader = `
-    <div class="page-header">
-      <img class="emblem-small" src="${cherubinoDataUri}" alt="" />
-      <span>Annuario del PN — Edizione ${year}${sectionLabel ? " — " + sectionLabel : ""}</span>
-    </div>`;
+  const groupFigure = (entry, i) => `
+    <figure class="group g${i + 1}">
+      <img src="${entry.imageUrl}" alt="" />
+      <figcaption><span>${escapeHtml(entry.names)}</span><em>${escapeHtml(entry.caption)}</em></figcaption>
+    </figure>`;
 
-  const gridPages = pages
-    .map(
-      (pageEntries, i) => `
-      <section class="page">
-        ${pageHeader}
-        <div class="grid">
-          ${pageEntries.map(cardHtml).join("\n")}
-        </div>
-        <div class="page-number">${i + 1}</div>
-      </section>`
-    )
-    .join("\n");
+  const pages = [intro, ...chunk(singles, 9).map((p) => `<div class="singles">${p.map(singleCard).join("")}</div>`)];
+  const groupPages = chunk(groups, 3).map((p) => `<div class="groups">${p.map(groupFigure).join("")}</div>`);
+
+  const body = [
+    ...pages.map((inner, i) => framedPage(i + 1, inner, i === 0 ? "intro" : "")),
+    ...groupPages.map((inner, i) => framedPage(pages.length + i + 1, inner)),
+  ].join("\n");
 
   return `<!DOCTYPE html>
 <html lang="it">
@@ -141,137 +181,98 @@ function buildHtml({ entries, year, sectionLabel, cherubinoDataUri, facultyIcons
 <meta charset="utf-8" />
 <style>
   @page { size: A4; margin: 0; }
+  :root { --navy: #0b2d6b; }
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: Georgia, "Times New Roman", serif;
-    color: #12161F;
-  }
+  body { margin: 0; color: var(--navy); font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; }
+  .serif { font-family: "Noto Serif", Georgia, "Times New Roman", serif; }
 
-  /* --- Copertina --------------------------------------------------- */
-  .cover {
-    width: 210mm;
-    height: 297mm;
-    background: #002B49;
-    color: #FFFFFF;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    page-break-after: always;
-  }
-  .cover img.emblem { width: 46mm; height: 46mm; border-radius: 50%; margin-bottom: 10mm; }
-  .cover h1 { font-size: 36pt; margin: 0; letter-spacing: 1px; }
-  .cover h2 { font-size: 20pt; font-weight: normal; font-style: italic; color: #4A9FD8; margin: 4mm 0 0; }
-  .cover .meta { margin-top: 14mm; font-size: 11pt; color: #D2E7F5; }
+  .page { position: relative; width: 210mm; height: 297mm; overflow: hidden; page-break-after: always; background: #fff; }
 
-  /* --- Pagine griglia ------------------------------------------------ */
-  .page {
-    width: 210mm;
-    height: 297mm;
-    padding: 14mm 12mm 10mm;
-    page-break-after: always;
-    position: relative;
-  }
-  .page-header {
-    display: flex;
-    align-items: center;
-    gap: 3mm;
-    border-bottom: 0.5pt solid #E3EAEF;
-    padding-bottom: 3mm;
-    margin-bottom: 6mm;
-    font-size: 9pt;
-    color: #4B5566;
-  }
-  .emblem-small { width: 7mm; height: 7mm; border-radius: 50%; }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6mm;
-  }
-  .card {
-    border: 0.5pt solid #E3EAEF;
-    border-radius: 2mm;
-    overflow: hidden;
-    break-inside: avoid;
-  }
-  .card-photo {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 4 / 5;
-    background: #002B49;
-  }
-  .card-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .badge {
-    position: absolute;
-    top: 2mm;
-    right: 2mm;
-  }
-  .badge-group {
-    background: rgba(0, 43, 73, 0.9);
-    color: #FFFFFF;
-    font-size: 6.5pt;
-    font-family: Arial, sans-serif;
-    padding: 1mm 2mm;
-    border-radius: 3mm;
-  }
-  .badge-faculty img {
-    width: 6mm;
-    height: 6mm;
-    border-radius: 50%;
-    box-shadow: 0 0 0 1pt rgba(255,255,255,0.85);
-  }
-  .card-body { padding: 2.5mm 3mm 3mm; }
-  .card-body h3 { font-size: 8.5pt; font-weight: bold; color: #002B49; margin: 0 0 1mm; line-height: 1.2; }
-  .card-body p { font-size: 7.5pt; font-style: italic; color: #4B5566; margin: 0; line-height: 1.25; }
-  .page-number {
-    position: absolute;
-    bottom: 8mm;
-    right: 12mm;
-    font-size: 8pt;
-    color: #4B5566;
-  }
+  /* --- Copertina ------------------------------------------------------- */
+  .cover { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12mm; text-align: center; }
+  .cover h1 { font-family: "Noto Serif", Georgia, serif; font-weight: 700; font-size: 54pt; line-height: 1.05; margin: 0; letter-spacing: 1pt; }
+  .cover img { width: 132mm; height: 132mm; border-radius: 50%; }
+  .cover h2 { font-family: "Noto Serif", Georgia, serif; font-weight: 700; font-size: 36pt; margin: 0; }
+
+  /* --- Cornice, emblema e numero di pagina --------------------------- */
+  .frame { position: absolute; left: 15mm; right: 15mm; top: 17mm; bottom: 16mm; border: 0.6mm solid var(--navy); }
+  .frame-emblem { position: absolute; top: 5mm; left: 50%; width: 24mm; height: 24mm; margin-left: -12mm; border-radius: 50%; background: #fff; box-shadow: 0 0 0 6mm #fff; }
+  .page-number { position: absolute; bottom: 9mm; width: 14mm; height: 14mm; border-radius: 50%; background: var(--navy); color: #fff; font-size: 12pt; display: flex; align-items: center; justify-content: center; }
+  .odd .page-number { left: 8mm; }
+  .even .page-number { right: 8mm; }
+  .content { position: absolute; left: 15mm; right: 15mm; top: 32mm; bottom: 22mm; }
+
+  /* --- Pagina 1: premessa e legenda ----------------------------------- */
+  .intro .content { display: flex; flex-direction: column; justify-content: space-between; padding: 0 5mm; }
+  .premessa h1 { font-family: "Noto Serif", Georgia, serif; font-weight: 400; font-size: 20pt; text-align: center; margin: 0 0 5mm; color: #111; }
+  .premessa p { font-family: "Noto Serif", Georgia, serif; font-size: 10.5pt; line-height: 1.35; color: #111; margin: 0 0 4mm; }
+  .legend { margin-top: auto; padding: 0 8mm 4mm; }
+  .legend h2 { font-weight: 400; font-size: 17pt; margin: 0 0 6mm; }
+  .legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm 10mm; }
+  .legend-item { display: flex; align-items: center; gap: 4mm; font-size: 9.5pt; line-height: 1.2; }
+  .legend-item img { width: 11mm; height: 11mm; border-radius: 50%; flex-shrink: 0; }
+
+  /* --- Foto singole: griglia 3x3 --------------------------------------- */
+  .singles { display: grid; grid-template-columns: repeat(3, 42mm); grid-template-rows: repeat(3, 1fr); justify-content: space-evenly; height: 100%; padding-top: 2mm; }
+  .single { display: flex; flex-direction: column; align-items: center; }
+  .single-photo { position: relative; width: 42mm; height: 42mm; z-index: 2; }
+  .single-photo .photo { width: 100%; height: 100%; object-fit: cover; border-radius: 3mm; display: block; }
+  .single-photo .faculty { position: absolute; top: -5mm; right: -5mm; width: 11mm; height: 11mm; border-radius: 50%; }
+  .single-name { position: relative; z-index: 1; width: 44mm; margin-top: -4mm; padding: 5.5mm 1mm 6.5mm; border: 0.45mm solid var(--navy); border-radius: 3mm; text-align: center; font-size: 10.5pt; line-height: 1.15; display: flex; flex-direction: column; }
+  .single-motto { position: relative; z-index: 2; width: 39mm; min-height: 17mm; margin-top: -4.5mm; padding: 2mm 2.5mm; border-radius: 2.5mm; background: var(--navy); color: #fff; font-style: italic; font-size: 7.5pt; line-height: 1.25; text-align: center; display: flex; align-items: center; justify-content: center; }
+
+  /* --- Foto di gruppo: tre per pagina, sfalsate ------------------------ */
+  .groups { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(6, 1fr); height: 100%; padding: 2mm 6mm; column-gap: 6mm; }
+  .group { margin: 0; display: table; width: 1px; justify-self: center; align-self: center; }
+  .g1 { grid-column: 1; grid-row: 1 / span 3; }
+  .g2 { grid-column: 2; grid-row: 3 / span 3; }
+  .g3 { grid-column: 1; grid-row: 5 / span 2; }
+  .group img { display: block; max-width: 78mm; max-height: 72mm; width: auto; height: auto; border-radius: 3mm 3mm 0 0; }
+  .g3 img { max-height: 52mm; }
+  .group figcaption { display: table-caption; caption-side: bottom; background: var(--navy); color: #fff; border-radius: 0 0 3mm 3mm; padding: 1.5mm 3mm 2mm; font-size: 8.5pt; line-height: 1.25; text-align: center; }
+  .group figcaption span, .group figcaption em { display: block; }
 </style>
 </head>
 <body>
-  <div class="cover">
-    <img class="emblem" src="${cherubinoDataUri}" alt="Annuario del PN" />
-    <h1>ANNUARIO DEL PN</h1>
-    <h2>${sectionLabel || "Edizione"}</h2>
-    <div class="meta">Edizione ${year} — generato il ${formatDate(new Date())}</div>
-  </div>
-  ${gridPages}
+  <section class="page cover">
+    <h1>ANNUARIO<br/>DEL PN</h1>
+    <img src="${emblem}" alt="Annuario del PN" />
+    <h2>${escapeHtml(subtitle)}</h2>
+  </section>
+  ${body}
 </body>
 </html>`;
 }
 
 async function main() {
-  const { section, year: yearArg, out } = parseArgs();
-  if (!["HALL_OF_FAME", "ANNUARIO_STORICO"].includes(section)) {
-    console.error(`Sezione non valida: ${section} (usa HALL_OF_FAME o ANNUARIO_STORICO)`);
-    process.exit(1);
-  }
+  const { year, subtitle, out } = parseArgs();
 
-  console.log(`Recupero le schede approvate per la sezione ${section}...`);
+  console.log(`Recupero le foto approvate per l'edizione ${year}...`);
   const { rows } = await sql.query(
-    `SELECT * FROM hall_of_fame_entries WHERE status = 'APPROVED' AND section = $1`,
-    [section]
+    // Le colonne del DB sono in snake_case (image_url): l'alias le allinea
+    // ai nomi usati da buildHtml (imageUrl), gli stessi del resto del sito.
+    `SELECT id, type, faculty, names, caption, image_url AS "imageUrl", created_at AS "createdAt"
+       FROM hall_of_fame_entries
+      WHERE status = 'APPROVED' AND section = 'ARCHIVIO' AND edition_year = $1`,
+    [year]
   );
 
   if (rows.length === 0) {
-    console.error("Nessuna scheda approvata trovata: niente da generare.");
+    console.error(`Nessuna foto approvata per l'edizione ${year}: niente da generare.`);
     process.exit(1);
   }
 
-  const entries = rows.sort((a, b) =>
-    extractSurname(a.names).localeCompare(extractSurname(b.names), "it", { sensitivity: "base" })
-  );
+  const singles = rows
+    .filter((r) => r.type === "SINGLE")
+    .sort((a, b) => extractSurname(a.names).localeCompare(extractSurname(b.names), "it", { sensitivity: "base" }));
+  const groups = rows
+    .filter((r) => r.type === "GROUP")
+    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
-  console.log(`${entries.length} schede trovate, ordinate per cognome.`);
+  console.log(`${singles.length} foto singole (ordinate per cognome) e ${groups.length} di gruppo.`);
 
-  const cherubinoPath = path.join(PROJECT_ROOT, "public/brand/cherubino-annuario.jpg");
-  const cherubinoDataUri = fs.existsSync(cherubinoPath) ? fileToDataUri(cherubinoPath) : "";
+  const emblemPath = path.join(PROJECT_ROOT, "public/brand/cherubino-annuario.jpg");
+  const emblem = fs.existsSync(emblemPath) ? fileToDataUri(emblemPath) : "";
 
   const facultyIcons = {};
   for (const [key, info] of Object.entries(FACULTIES)) {
@@ -279,28 +280,29 @@ async function main() {
     if (fs.existsSync(iconPath)) facultyIcons[key] = fileToDataUri(iconPath);
   }
 
-  const html = buildHtml({
-    entries,
-    year: yearArg || getConfiguredYear(),
-    sectionLabel: section === "HALL_OF_FAME" ? "Hall of Fame" : "Annuario Storico",
-    cherubinoDataUri,
-    facultyIcons,
-  });
+  const premessaPath = path.join(PROJECT_ROOT, `content/premessa-${year}.txt`);
+  const premessa = fs.existsSync(premessaPath) ? fs.readFileSync(premessaPath, "utf8") : "";
 
-  const outputPath = out || path.join(PROJECT_ROOT, `output/annuario-${section.toLowerCase()}-${getConfiguredYear()}.pdf`);
+  const html = buildHtml({ singles, groups, subtitle, premessa, emblem, facultyIcons });
+
+  const outputPath = out || path.join(PROJECT_ROOT, `output/annuario-del-pn-${year}.pdf`);
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 
   console.log("Rendo il PDF con Puppeteer...");
   const puppeteer = require("puppeteer");
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({ headless: true });
   try {
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0", timeout: 120000 });
-    await page.pdf({
-      path: outputPath,
-      printBackground: true,
-      preferCSSPageSize: true,
-    });
+    await page.setContent(html, { waitUntil: "networkidle0", timeout: 180000 });
+    // Aspetta che tutte le foto (scaricate da Vercel Blob) siano pronte.
+    await page.evaluate(() =>
+      Promise.all(
+        Array.from(document.images).map((img) =>
+          img.complete ? null : new Promise((r) => { img.onload = img.onerror = r; })
+        )
+      )
+    );
+    await page.pdf({ path: outputPath, printBackground: true, preferCSSPageSize: true });
   } finally {
     await browser.close();
   }
@@ -315,7 +317,7 @@ function getConfiguredYear() {
   const configPath = path.join(PROJECT_ROOT, "src/config/current-edition.ts");
   const content = fs.readFileSync(configPath, "utf8");
   const match = content.match(/year:\s*(\d{4})/);
-  return match ? match[1] : new Date().getFullYear();
+  return match ? Number(match[1]) : new Date().getFullYear();
 }
 
 if (require.main === module) {
@@ -325,4 +327,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { buildHtml, extractSurname, getConfiguredYear };
+module.exports = { buildHtml, extractSurname, splitName, getConfiguredYear };

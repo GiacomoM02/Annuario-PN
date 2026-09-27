@@ -2,24 +2,23 @@
 
 import { useEffect } from "react";
 import { X } from "lucide-react";
-import { UploadForm } from "@/components/UploadForm";
-import type { GallerySection } from "@/lib/gallery-actions";
-import type { HallOfFameEntry } from "../../drizzle/schema";
 
+/**
+ * Finestra modale che contiene un modulo di invio (UploadForm), usata dalle
+ * gallerie e dalla pagina Archivio.
+ */
 export function UploadModal({
-  section,
   eyebrow,
-  submitLabel,
+  title = "Aggiungi la tua foto",
   open,
   onClose,
-  onUploaded,
+  children,
 }: {
-  section: GallerySection;
   eyebrow: string;
-  submitLabel: string;
+  title?: string;
   open: boolean;
   onClose: () => void;
-  onUploaded: (entry: HallOfFameEntry) => void;
+  children: React.ReactNode;
 }) {
   useEffect(() => {
     if (!open) return;
@@ -46,7 +45,7 @@ export function UploadModal({
           <div>
             <p className="eyebrow">{eyebrow}</p>
             <h2 className="mt-1 font-display text-xl font-semibold text-ink-950">
-              Aggiungi la tua foto
+              {title}
             </h2>
           </div>
           <button
@@ -57,11 +56,7 @@ export function UploadModal({
             <X size={18} />
           </button>
         </div>
-        <UploadForm
-          section={section}
-          submitLabel={submitLabel}
-          onUploaded={onUploaded}
-        />
+        {children}
       </div>
     </div>
   );

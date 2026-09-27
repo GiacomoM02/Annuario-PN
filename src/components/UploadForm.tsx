@@ -4,31 +4,45 @@ import { useState, useTransition } from "react";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import {
   checkEmailDomainAction,
+  createEditionEntryAction,
   createGalleryEntryAction,
   type GallerySection,
 } from "@/lib/gallery-actions";
 import { facultyOptions } from "@/lib/faculties";
+import { SINGLE_CAPTION_MAX } from "@/lib/validations";
 import { cn } from "@/lib/utils";
 import type { HallOfFameEntry } from "../../drizzle/schema";
 
 type Step = "email" | "details" | "success";
 type PhotoType = "SINGLE" | "GROUP";
 
-export function UploadForm({
-  section,
-  submitLabel = "Pubblica",
-  onUploaded,
-}: {
-  section: GallerySection;
-  submitLabel?: string;
-  onUploaded: (entry: HallOfFameEntry) => void;
-}) {
+/**
+ * Modulo di invio in due passi (email istituzionale, poi foto), in due
+ * varianti:
+ * - "gallery": Hall of Fame e Annuario Storico, solo foto singole con
+ *   facoltà e nome;
+ * - "edition": invii per l'annuario dell'anno (pagina Archivio), foto
+ *   singola con frase breve oppure di gruppo con didascalia.
+ */
+export function UploadForm(
+  props: {
+    submitLabel?: string;
+    onUploaded: (entry: HallOfFameEntry) => void;
+  } & (
+    | { mode: "gallery"; section: GallerySection }
+    | { mode: "edition"; year: number }
+  )
+) {
+  const { submitLabel = "Invia", onUploaded } = props;
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [photoType, setPhotoType] = useState<PhotoType>("SINGLE");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [lastEntry, setLastEntry] = useState<HallOfFameEntry | null>(null);
+
+  const isEdition = props.mode === "edition";
+  const isSingle = !isEdition || photoType === "SINGLE";
 
   // --- Step 1: controlla che l'email sia @unipi.it / @studenti.unipi.it ---
   // Nessun codice inviato: solo un controllo di formato, non una vera prova
@@ -43,15 +57,17 @@ export function UploadForm({
     });
   }
 
-  // --- Step 2: dettagli foto + upload, sulla sezione (Hall of Fame o
-  // Annuario Storico) passata da chi usa questo form. La scheda nasce
-  // sempre in moderazione (status PENDING): non appare subito nella
-  // galleria, quindi qui mostriamo solo un messaggio di conferma. --------
+  // --- Step 2: dettagli foto + upload. La scheda nasce sempre in
+  // moderazione (status PENDING), quindi qui mostriamo solo un messaggio
+  // di conferma. ---------------------------------------------------------
   function handleSubmitEntry(formData: FormData) {
     setError(null);
     formData.set("email", email);
     startTransition(async () => {
-      const result = await createGalleryEntryAction(section, formData);
+      const result =
+        props.mode === "edition"
+          ? await createEditionEntryAction(formData)
+          : await createGalleryEntryAction(props.section, formData);
       if (!result.ok) return setError(result.error);
       setLastEntry(result.data);
       setStep("success");
@@ -89,26 +105,28 @@ export function UploadForm({
 
       {step === "details" && (
         <form action={handleSubmitEntry} className="space-y-4">
-          <Field label="Tipo di foto">
-            <div className="flex gap-3">
-              <RadioPill
-                name="type"
-                value="SINGLE"
-                label="Singola"
-                checked={photoType === "SINGLE"}
-                onChange={() => setPhotoType("SINGLE")}
-              />
-              <RadioPill
-                name="type"
-                value="GROUP"
-                label="Gruppo"
-                checked={photoType === "GROUP"}
-                onChange={() => setPhotoType("GROUP")}
-              />
-            </div>
-          </Field>
+          {isEdition && (
+            <Field label="Tipo di foto">
+              <div className="flex gap-3">
+                <RadioPill
+                  name="type"
+                  value="SINGLE"
+                  label="Singola"
+                  checked={photoType === "SINGLE"}
+                  onChange={() => setPhotoType("SINGLE")}
+                />
+                <RadioPill
+                  name="type"
+                  value="GROUP"
+                  label="Gruppo"
+                  checked={photoType === "GROUP"}
+                  onChange={() => setPhotoType("GROUP")}
+                />
+              </div>
+            </Field>
+          )}
 
-          {photoType === "SINGLE" && (
+          {isSingle && (
             <Field label="Facoltà">
               <select name="faculty" required defaultValue="" className={inputClass}>
                 <option value="" disabled>
@@ -123,26 +141,53 @@ export function UploadForm({
             </Field>
           )}
 
-          <Field label="Nome e cognome (per la foto di gruppo, elenca tutti)">
-            <textarea
-              name="names"
-              required
-              rows={2}
-              placeholder="Mario Rossi, Giulia Bianchi, Luca Verdi"
-              className={inputClass}
-            />
-          </Field>
+          {isSingle ? (
+            <Field label="Nome e cognome">
+              <input
+                type="text"
+                name="names"
+                required
+                maxLength={80}
+                placeholder="Mario Rossi"
+                className={inputClass}
+              />
+            </Field>
+          ) : (
+            <Field label="Chi c'è nella foto">
+              <textarea
+                name="names"
+                required
+                rows={2}
+                placeholder="Mario Rossi, Giulia Bianchi, Luca Verdi"
+                className={inputClass}
+              />
+            </Field>
+          )}
 
-          <Field label="Didascalia">
-            <input
-              type="text"
-              name="caption"
-              required
-              maxLength={280}
-              placeholder="Ultimo giorno di tesi, giugno 2026"
-              className={inputClass}
-            />
-          </Field>
+          {isEdition &&
+            (isSingle ? (
+              <Field label={`La tua frase (max ${SINGLE_CAPTION_MAX} caratteri)`}>
+                <input
+                  type="text"
+                  name="caption"
+                  required
+                  maxLength={SINGLE_CAPTION_MAX}
+                  placeholder="L'acciaio è duttile, l'ingegnere no."
+                  className={inputClass}
+                />
+              </Field>
+            ) : (
+              <Field label="Didascalia (cosa succede, quando)">
+                <input
+                  type="text"
+                  name="caption"
+                  required
+                  maxLength={280}
+                  placeholder="Comitato colazioni, dicembre 2025"
+                  className={inputClass}
+                />
+              </Field>
+            ))}
 
           <Field label="Immagine (max 5MB)">
             <input
@@ -175,9 +220,9 @@ export function UploadForm({
             Foto inviata!
           </h3>
           <p className="max-w-sm text-sm text-ink-700">
-            Grazie {lastEntry.names.split(",")[0]}. La tua foto è in attesa di
-            approvazione: comparirà nella galleria non appena il team l'avrà
-            verificata.
+            {props.mode === "edition"
+              ? `Grazie! La tua foto è in attesa di verifica: una volta approvata, finirà nell'Annuario ${props.year}.`
+              : `Grazie ${lastEntry.names.split(",")[0]}. La tua foto è in attesa di approvazione: comparirà nella galleria non appena il team l'avrà verificata.`}
           </p>
           <button
             type="button"

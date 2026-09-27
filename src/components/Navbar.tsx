@@ -3,25 +3,34 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const links = [{ href: "/", label: "Home" }];
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/archivio", label: "Archivio" },
+  { href: "/hall-of-fame", label: "Hall of Fame" },
+];
 
 export function Navbar() {
-  const isHome = usePathname() === "/";
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
   // In home niente barra bianca: la navbar è trasparente e appoggiata
-  // sopra le due colonne (logo sul blu a sinistra, link sulla foto a destra),
-  // allineata al contenuto di ciascuna colonna.
+  // sopra le due colonne (logo sul bianco a sinistra, link sulla foto a
+  // destra), allineata al contenuto di ciascuna colonna. Da telefono i link
+  // vanno su una riga sotto il logo.
   if (isHome) {
     return (
       <header className="absolute inset-x-0 top-0 z-20 lg:grid lg:grid-cols-2">
-        <div className="flex items-center justify-between px-6 pt-8 lg:block lg:pt-10">
+        <div className="px-6 pt-4 tall:pt-5">
           <div className="lg:mx-auto lg:max-w-xl lg:px-10">
-            <Brand light />
+            <Affiliation light />
+            <div className="mt-3 lg:mt-5 tall:mt-7">
+              <Brand light />
+            </div>
+            <NavLinks tone="panel" pathname={pathname} className="mt-3 lg:hidden" />
           </div>
-          <NavLinks tone="panel" className="lg:hidden" />
         </div>
-        <div className="hidden justify-end px-10 pt-10 lg:flex">
-          <NavLinks tone="photo" />
+        <div className="hidden justify-end px-10 pt-8 lg:flex tall:pt-10">
+          <NavLinks tone="photo" pathname={pathname} />
         </div>
       </header>
     );
@@ -29,37 +38,64 @@ export function Navbar() {
 
   return (
     <header className="border-b border-ink-950/10 bg-paper-50/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Brand />
-        <nav className="flex items-center gap-8">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm text-ink-800 decoration-unipi-500 hover:text-ink-950 hover:underline"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+      <div className="mx-auto max-w-6xl px-6 pb-4 pt-3">
+        <Affiliation />
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+          <Brand />
+          <nav className="flex items-center gap-6 sm:gap-8">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-sm decoration-unipi-500 underline-offset-4 hover:text-ink-950 hover:underline ${
+                  isActive(pathname, link.href)
+                    ? "font-semibold text-unipi-700 underline"
+                    : "text-ink-800"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </div>
     </header>
   );
 }
 
+function isActive(pathname: string, href: string) {
+  return href === "/" ? pathname === "/" : pathname.startsWith(href);
+}
+
+// Micro-testo in cima alla pagina, subito sotto la linea blu Unipi del
+// layout: dice a colpo d'occhio dove siamo e bilancia lo spazio sopra il
+// titolo "Annuario del PN".
+function Affiliation({ light = false }: { light?: boolean }) {
+  return (
+    <p
+      className={`text-[10px] font-medium uppercase tracking-[0.18em] ${
+        light ? "text-hero-fg/55" : "text-ink-700/60"
+      }`}
+    >
+      Università di Pisa — Polo Porta Nuova
+    </p>
+  );
+}
+
 function Brand({ light = false }: { light?: boolean }) {
+  const size = light ? "text-2xl lg:text-[2rem] tall:text-[2.5rem]" : "text-lg";
   return (
     <Link href="/" className="group flex items-baseline gap-2">
       <span
-        className={`font-display text-lg font-semibold ${
-          light ? "text-hero-fg lg:text-3xl" : "text-ink-900"
+        className={`font-display font-semibold ${size} ${
+          light ? "text-hero-fg" : "text-ink-900"
         }`}
       >
         Annuario
       </span>
       <span
-        className={`font-display text-lg italic ${
-          light ? "text-hero-accent-deep lg:text-3xl" : "text-unipi-600"
+        className={`font-display italic ${size} ${
+          light ? "text-hero-accent-deep" : "text-unipi-600"
         }`}
       >
         del PN
@@ -68,30 +104,41 @@ function Brand({ light = false }: { light?: boolean }) {
   );
 }
 
-// Link in versione "pillola": scura e semitrasparente sopra la foto
-// (desktop), chiara come il chip "Università di Pisa" sopra la colonna
-// color carta (telefono, dove la foto sta più in basso).
+// Link della home raccolti in una "pillola": scura e semitrasparente sopra
+// la foto (desktop), chiara sopra la colonna bianca (telefono). La pagina
+// corrente è evidenziata.
 const pillTone = {
-  photo:
-    "bg-hero-ink/55 text-hero-cream backdrop-blur hover:bg-hero-ink/75",
-  panel:
-    "border border-hero-fg/20 bg-hero-fg/5 text-hero-fg hover:bg-hero-fg/10",
+  photo: {
+    group: "bg-hero-ink/55 backdrop-blur",
+    link: "text-hero-cream hover:bg-hero-cream/15",
+    active: "bg-hero-cream text-hero-ink",
+  },
+  panel: {
+    group: "border border-hero-fg/20 bg-hero-fg/5",
+    link: "text-hero-fg hover:bg-hero-fg/10",
+    active: "bg-hero-fg text-hero-cream",
+  },
 };
 
 function NavLinks({
   tone,
+  pathname,
   className = "",
 }: {
   tone: keyof typeof pillTone;
+  pathname: string;
   className?: string;
 }) {
+  const t = pillTone[tone];
   return (
-    <nav className={`flex items-center gap-3 ${className}`}>
+    <nav className={`inline-flex items-center gap-1 rounded-full p-1 ${t.group} ${className}`}>
       {links.map((link) => (
         <Link
           key={link.href}
           href={link.href}
-          className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${pillTone[tone]}`}
+          className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
+            isActive(pathname, link.href) ? t.active : t.link
+          }`}
         >
           {link.label}
         </Link>

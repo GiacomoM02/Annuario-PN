@@ -1,7 +1,8 @@
 /**
- * Stato dell'edizione in corso: finché siamo nella finestra di invio,
- * il sito mostra il pulsante per caricare le foto; una volta chiusa,
- * mostra il pulsante per scaricare l'annuario pubblicato.
+ * Stato dell'edizione in corso: finché siamo nella finestra di invio, il
+ * sito permette di mandare le foto per l'annuario dalla pagina Archivio;
+ * una volta chiusa, rimanda all'Archivio per sfogliare le edizioni
+ * pubblicate (i PDF si aggiungono in src/config/editions.ts).
  *
  * Per aggiornare le date ogni anno, basta modificare questo file.
  */
@@ -12,19 +13,19 @@ export const currentEditionConfig = {
   submissionsOpenAt: "2026-01-01T00:00:00+01:00",
   submissionsCloseAt: "2026-05-31T23:59:59+02:00",
 
-  // PDF pubblicato al termine della raccolta (percorso in /public o URL
-  // esterno, es. Vercel Blob). Usato solo quando le consegne sono chiuse.
-  pdfUrl: "/pdf/annuario-del-pn-2026.pdf",
+  // Invii massimi per persona (per email istituzionale) in ogni edizione.
+  maxSinglePerPerson: 1,
+  maxGroupPerPerson: 3,
 
   // Interruttore manuale: se impostato esplicitamente (true/false),
   // sovrascrive il calcolo automatico in base alle date. Utile per
-  // forzare la modalità download in anticipo, o riaprire gli invii
-  // senza cambiare le date sopra. Lascia "null" per usare le date.
+  // chiudere gli invii in anticipo, o riaprirli senza cambiare le date
+  // sopra. Lascia "null" per usare le date.
   forceSubmissionOpen: null as boolean | null,
 };
 
 /**
- * true = mostra il form/CTA di upload, false = mostra il download del PDF.
+ * true = invii aperti per l'edizione in corso, false = invii chiusi.
  */
 export function isSubmissionOpen(now: Date = new Date()): boolean {
   const { forceSubmissionOpen, submissionsOpenAt, submissionsCloseAt } =

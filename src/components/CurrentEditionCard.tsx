@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Camera, Download } from "lucide-react";
 import { currentEditionConfig, isSubmissionOpen } from "@/config/current-edition";
+import { editions } from "@/config/editions";
 
 function formatDate(iso: string) {
   return new Intl.DateTimeFormat("it-IT", {
@@ -10,46 +11,48 @@ function formatDate(iso: string) {
   }).format(new Date(iso));
 }
 
+const buttonClass =
+  "inline-flex items-center gap-2 rounded-full bg-hero-band-fg px-5 py-2.5 text-sm font-semibold text-hero-cream shadow-sm transition hover:bg-hero-band-fg/90";
+
 // Barra compatta dell'edizione corrente, pensata per stare sopra la foto
-// di sfondo della home (testo blu Unipi sull'alone azzurro).
+// di sfondo della home (testo blu Unipi sull'alone azzurro). Con gli invii
+// aperti porta al modulo nell'Archivio; altrimenti scarica direttamente il
+// PDF dell'ultima edizione pubblicata (la più recente in editions.ts).
 export function CurrentEditionCard() {
-  const { year, submissionsCloseAt, pdfUrl } = currentEditionConfig;
+  const { year, submissionsCloseAt } = currentEditionConfig;
   const open = isSubmissionOpen();
+  const latest = editions.reduce<(typeof editions)[number] | undefined>(
+    (acc, e) => (!acc || e.year > acc.year ? e : acc),
+    undefined
+  );
 
   return (
     <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
       <div>
         <p className="text-xs font-semibold uppercase tracking-wider text-hero-band-fg/80">
-          {open ? `Invii aperti — edizione ${year}` : `Edizione ${year} · Pubblicata`}
+          {open
+            ? `Invii aperti — edizione ${year}`
+            : `Edizione ${latest?.year ?? year} · Pubblicata`}
         </p>
         <p className="mt-1 font-display text-xl font-semibold text-hero-band-fg sm:text-2xl">
           {open
             ? `Consegne fino al ${formatDate(submissionsCloseAt)}`
-            : `L'Annuario ${year} è pronto.`}
+            : `L'Annuario ${latest?.year ?? year} è pronto.`}
         </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         {open ? (
-          <Link
-            href="/hall-of-fame"
-            className="inline-flex items-center gap-2 rounded-full bg-hero-band-fg px-5 py-2.5 text-sm font-semibold text-hero-cream shadow-sm transition hover:bg-hero-band-fg/90"
-          >
+          <Link href="/archivio#invia" className={buttonClass}>
             <Camera size={16} />
             Invia la tua foto
           </Link>
-        ) : (
-          <a
-            href={pdfUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            download
-            className="inline-flex items-center gap-2 rounded-full bg-hero-band-fg px-5 py-2.5 text-sm font-semibold text-hero-cream shadow-sm transition hover:bg-hero-band-fg/90"
-          >
+        ) : latest ? (
+          <a href={latest.pdfUrl} download className={buttonClass}>
             <Download size={16} />
-            Scarica l'annuario {year}
+            Scarica l'ultima edizione
           </a>
-        )}
+        ) : null}
         <Link
           href="/archivio"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-hero-band-fg/90 underline-offset-4 transition hover:text-hero-band-fg hover:underline"

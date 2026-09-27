@@ -10,70 +10,61 @@ export const dynamic = "force-dynamic";
 
 export default function HomePage() {
   return (
-    <div className="lg:grid lg:min-h-screen lg:grid-cols-2">
-      {/* Colonna sinistra: Hero blu Unipi con emblema, titolo e tasti. */}
-      <section className="hero-panel relative flex items-center lg:items-start">
-        <div className="relative mx-auto w-full max-w-xl px-6 pb-14 pt-24 lg:px-10 lg:pt-28">
-          {/* Emblema "Annuario del PN" (Cherubino), sopra il logo testuale. */}
+    // Da desktop la hero occupa esattamente uno schermo (sotto i 600px di
+    // altezza si scorre): tutto il contenuto resta visibile senza scroll.
+    <div className="lg:grid lg:h-[100svh] lg:min-h-[600px] lg:grid-cols-2">
+      {/* Colonna sinistra: emblema, titolo, tasti e "Come partecipare",
+          centrati nello spazio sotto la navbar (my-auto: se non c'è spazio
+          a sufficienza il contenuto parte dall'alto invece di tagliarsi). */}
+      <section className="hero-panel relative flex items-center lg:flex-col lg:items-stretch lg:pb-5 lg:pt-[6.75rem] tall:pt-36">
+        <div className="relative mx-auto w-full max-w-xl px-6 pb-14 pt-36 lg:my-auto lg:px-10 lg:py-0 tall:my-0">
+          {/* Emblema "Annuario del PN" (Cherubino). */}
           <img
             src="/brand/cherubino-annuario.jpg"
             alt="Annuario del PN"
-            className="h-16 w-16 rounded-full shadow-sm sm:h-20 sm:w-20 lg:h-28 lg:w-28"
+            className="h-20 w-20 rounded-full shadow-sm sm:h-24 sm:w-24 lg:h-24 lg:w-24 xl:h-28 xl:w-28 tall:h-[8.5rem] tall:w-[8.5rem]"
           />
 
-          {/* Logo Unipi: sostituisci /public/brand/unipi-logo.svg con il
-              logo ufficiale (versione blu/scura, per contrasto sulla colonna
-              color carta). */}
-          <img
-            src="/brand/unipi-logo.svg"
-            alt="Università di Pisa"
-            className="mt-3 h-8 w-auto opacity-95"
-          />
-
-          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-hero-accent/35 bg-hero-fg/5 px-3 py-1 text-[11px] font-medium text-hero-fg">
-            <GraduationCap size={12} />
-            Università di Pisa — Polo Porta Nuova
-          </div>
-
-          <h1 className="mt-4 font-display text-3xl font-semibold leading-[1.1] text-hero-fg sm:text-4xl">
+          <h1 className="mt-4 font-display text-3xl font-semibold leading-[1.1] text-hero-fg sm:text-4xl lg:text-[1.75rem] xl:text-[2rem] tall:mt-5 tall:text-4xl">
             Volti, nomi e momenti che rendono unico{" "}
             <span className="italic text-hero-accent">il nostro polo.</span>
           </h1>
-          <p className="mt-5 text-base text-hero-fg/80 sm:text-lg">
+          <p className="mt-5 text-base text-hero-fg/80 sm:text-lg lg:mt-3 lg:text-[0.95rem] lg:leading-relaxed tall:mt-5 tall:text-lg">
             {siteConfig.name} raccoglie, edizione dopo edizione, chi ha
-            abitato questi corridoi. Sfoglia le edizioni passate o aggiungi
-            oggi stesso la tua foto alla Hall of Fame.
+            abitato questi corridoi. Sfoglia le edizioni passate, manda la
+            tua foto per l'annuario o, se ti sei laureato, entra nella Hall
+            of Fame.
           </p>
 
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-7 flex flex-wrap gap-3 lg:mt-5 lg:gap-2.5 tall:mt-7 tall:gap-3">
             <Link
               href="/archivio"
-              className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base lg:px-5 lg:py-2.5 lg:text-sm tall:px-6 tall:py-3 tall:text-base"
             >
               <BookOpen size={16} />
               Archivio
             </Link>
             <Link
               href="/hall-of-fame"
-              className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base lg:px-5 lg:py-2.5 lg:text-sm tall:px-6 tall:py-3 tall:text-base"
             >
               <GraduationCap size={16} />
               Hall of Fame
             </Link>
             <Link
               href="/annuario-storico"
-              className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base lg:px-5 lg:py-2.5 lg:text-sm tall:px-6 tall:py-3 tall:text-base"
             >
               <ScrollText size={16} />
               Annuario Storico
             </Link>
           </div>
 
-          <div className="mt-10 border-t border-hero-fg/15 pt-6">
+          <div className="mt-10 border-t border-hero-fg/15 pt-6 lg:mt-6 lg:pt-4 tall:mt-10 tall:pt-6">
             <p className="text-xs font-medium uppercase tracking-wider text-hero-accent-deep">
               Come partecipare
             </p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:mt-3 tall:mt-4">
               <MiniStep
                 icon={<Mail size={14} />}
                 title="Email istituzionale"
@@ -82,7 +73,7 @@ export default function HomePage() {
               <MiniStep
                 icon={<Camera size={14} />}
                 title="Carica la tua foto"
-                body="Singola o di gruppo, in due minuti."
+                body="Per l'annuario: 1 singola e fino a 3 di gruppo."
               />
             </div>
           </div>

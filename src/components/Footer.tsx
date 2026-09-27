@@ -24,7 +24,9 @@ export function Footer() {
         <div className="mt-6 text-xs text-paper-100/50">
           Le email istituzionali usate per la verifica non vengono mai
           salvate: servono solo a confermare che chi carica una foto fa
-          parte dell'Università di Pisa.
+          parte dell'Università di Pisa. Per le foto dell'annuario ne
+          conserviamo solo un'impronta cifrata e non reversibile, per
+          rispettare il limite di invii a persona.
         </div>
       </div>
     </footer>

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import { PhotoCard } from "@/components/PhotoCard";
 import { UploadModal } from "@/components/UploadModal";
+import { UploadForm } from "@/components/UploadForm";
 import {
   getLatestEntriesAction,
   type GallerySection,
@@ -85,13 +86,17 @@ export function GalleryBoard({
       )}
 
       <UploadModal
-        section={section}
         eyebrow={modalEyebrow}
-        submitLabel={submitLabel}
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onUploaded={handleUploaded}
-      />
+      >
+        <UploadForm
+          mode="gallery"
+          section={section}
+          submitLabel={submitLabel}
+          onUploaded={handleUploaded}
+        />
+      </UploadModal>
     </div>
   );
 }
