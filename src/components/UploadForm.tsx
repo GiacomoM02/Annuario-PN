@@ -164,6 +164,19 @@ export function UploadForm(
             </Field>
           )}
 
+          {props.mode === "gallery" && props.section === "ANNUARIO_STORICO" && (
+            <Field label={`Didascalia (max ${SINGLE_CAPTION_MAX} caratteri)`}>
+              <input
+                type="text"
+                name="caption"
+                required
+                maxLength={SINGLE_CAPTION_MAX}
+                placeholder="Al PN dal 2019, tra un caffè e un esame"
+                className={inputClass}
+              />
+            </Field>
+          )}
+
           {isEdition &&
             (isSingle ? (
               <Field label={`La tua frase (max ${SINGLE_CAPTION_MAX} caratteri)`}>

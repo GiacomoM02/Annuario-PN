@@ -3,7 +3,8 @@ import { facultyOptions } from "@/lib/faculties";
 import type { HallOfFameEntry } from "../../drizzle/schema";
 
 // Scheda delle gallerie (Hall of Fame e Annuario Storico): foto, icona della
-// facoltà e nome, come nelle pagine dell'annuario.
+// facoltà e nome, come nelle pagine dell'annuario, più l'eventuale
+// didascalia (solo Annuario Storico).
 export function PhotoCard({ entry }: { entry: HallOfFameEntry }) {
   const faculty = facultyOptions.find((f) => f.value === entry.faculty);
 
@@ -34,6 +35,11 @@ export function PhotoCard({ entry }: { entry: HallOfFameEntry }) {
         <h3 className="font-display text-base font-semibold leading-snug text-unipi-700">
           {entry.names}
         </h3>
+        {entry.caption && (
+          <p className="mt-1 text-sm italic leading-snug text-ink-700">
+            {entry.caption}
+          </p>
+        )}
       </div>
     </article>
   );

@@ -34,6 +34,7 @@ const facultySchema = z.enum(facultyValues, {
 export const SINGLE_CAPTION_MAX = 90;
 
 // Hall of Fame e Annuario Storico: solo foto singole, con facoltà e nome.
+// L'Annuario Storico richiede anche una didascalia breve (vedi gallery-actions).
 export const gallerySingleSchema = z.object({
   faculty: facultySchema,
   names: z
@@ -41,6 +42,12 @@ export const gallerySingleSchema = z.object({
     .trim()
     .min(3, "Inserisci nome e cognome.")
     .max(80, "Nome troppo lungo."),
+  caption: z
+    .string()
+    .trim()
+    .min(1, "Aggiungi una didascalia.")
+    .max(SINGLE_CAPTION_MAX, `La didascalia può avere al massimo ${SINGLE_CAPTION_MAX} caratteri.`)
+    .optional(),
 });
 
 // Archivio (edizione annuale): foto singola (facoltà + frase breve) oppure

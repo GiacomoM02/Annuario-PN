@@ -38,7 +38,8 @@ export default async function AnnuarioStoricoPage() {
       <p className="mt-4 max-w-2xl text-ink-700">
         Frequenti il PN da tempo ma non hai mai mandato la tua foto per
         l'annuario? Qui puoi farlo in qualsiasi momento: la tua foto, la tua
-        facoltà e il tuo nome. Bastano un'email istituzionale e una foto.
+        facoltà, il tuo nome e una didascalia. Bastano un'email
+        istituzionale e una foto.
       </p>
 
       <GalleryBoard

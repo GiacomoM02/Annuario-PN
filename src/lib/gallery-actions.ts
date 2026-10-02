@@ -41,7 +41,8 @@ export async function checkEmailDomainAction(email: string): Promise<ActionResul
 
 // ---------------------------------------------------------------------------
 // 2. Nuova scheda in una galleria (Hall of Fame o Annuario Storico): solo
-//    foto singole, con facoltà e nome, senza didascalia. "section" viene
+//    foto singole, con facoltà e nome; l'Annuario Storico richiede anche
+//    una didascalia. "section" viene
 //    passata dal componente (via prop), non dall'utente. Ogni scheda nasce
 //    SEMPRE con status "PENDING" e diventa visibile solo dopo l'approvazione.
 // ---------------------------------------------------------------------------
@@ -63,6 +64,9 @@ export async function createGalleryEntryAction(
   const parsed = gallerySingleSchema.safeParse({
     faculty: formData.get("faculty") || undefined,
     names: formData.get("names"),
+    // Obbligatoria solo nell'Annuario Storico: una stringa vuota non passa
+    // la validazione (min 1), mentre per la Hall of Fame il campo è ignorato.
+    caption: section === "ANNUARIO_STORICO" ? String(formData.get("caption") ?? "") : undefined,
   });
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0].message };
@@ -84,6 +88,7 @@ export async function createGalleryEntryAction(
         status: "PENDING",
         faculty: parsed.data.faculty,
         names: parsed.data.names,
+        caption: parsed.data.caption ?? null,
         imageUrl,
       })
       .returning();
