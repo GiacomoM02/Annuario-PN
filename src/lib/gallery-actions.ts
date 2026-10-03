@@ -225,5 +225,5 @@ export async function getLatestEntriesAction(
       )
     )
     .orderBy(desc(schema.hallOfFameEntries.createdAt))
-    .limit(60);
+    .limit(1000);
 }

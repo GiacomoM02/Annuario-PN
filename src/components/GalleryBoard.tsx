@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import { PhotoCard } from "@/components/PhotoCard";
+import { YearbookCard } from "@/components/YearbookCard";
 import { UploadModal } from "@/components/UploadModal";
 import { UploadForm } from "@/components/UploadForm";
 import {
@@ -25,12 +26,16 @@ export function GalleryBoard({
   addButtonLabel = "Aggiungi la tua foto",
   modalEyebrow,
   submitLabel,
+  variant = "default",
 }: {
   section: GallerySection;
   initialEntries: HallOfFameEntry[];
   addButtonLabel?: string;
   modalEyebrow: string;
   submitLabel: string;
+  // "yearbook": schede come nelle pagine dell'annuario, in griglia per righe
+  // (l'ordine alfabetico si legge da sinistra a destra).
+  variant?: "default" | "yearbook";
 }) {
   const [entries, setEntries] = useState(initialEntries);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -78,11 +83,19 @@ export function GalleryBoard({
           Nessuna foto ancora. Sii il primo ad aggiungere la tua.
         </div>
       ) : (
-        <div className="mt-8 columns-2 gap-5 sm:columns-3 lg:columns-4 [&>*]:mb-5">
-          {entries.map((entry) => (
-            <PhotoCard key={entry.id} entry={entry} />
-          ))}
-        </div>
+        variant === "yearbook" ? (
+          <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-12 sm:grid-cols-3 lg:grid-cols-4">
+            {entries.map((entry) => (
+              <YearbookCard key={entry.id} entry={entry} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-8 columns-2 gap-5 sm:columns-3 lg:columns-4 [&>*]:mb-5">
+            {entries.map((entry) => (
+              <PhotoCard key={entry.id} entry={entry} />
+            ))}
+          </div>
+        )
       )}
 
       <UploadModal

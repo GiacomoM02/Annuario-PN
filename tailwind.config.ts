@@ -18,6 +18,9 @@ const config: Config = {
           700: "#002B49", // blu istituzionale scuro (header, footer, testo enfatizzato)
           900: "#001B30",
         },
+        // Blu delle pagine dell'annuario (cornici, nomi, etichette): lo stesso
+        // del PDF della prima edizione e di scripts/generate-pdf.js.
+        yearbook: "#0B2D6B",
         // Neutro quasi-nero per il testo, separato dal blu del brand.
         ink: {
           950: "#0A0E14",

@@ -8,7 +8,8 @@
  * - pagina 1 con la premessa (facoltativa) e la legenda delle facoltà;
  * - foto singole in griglia 3x3, ordinate per cognome: foto quadrata, icona
  *   della facoltà, nome su due righe e frase in un'etichetta blu;
- * - foto di gruppo, tre per pagina e sfalsate, con la didascalia sotto;
+ * - foto di gruppo con la didascalia sotto: le verticali sfalsate a
+ *   sinistra e a destra, le orizzontali centrate a tutta larghezza;
  * - ogni pagina incorniciata, con l'emblema in alto e il numero in basso.
  *
  * Uso:
@@ -16,8 +17,12 @@
  *   npm run generate:pdf -- --year=2027
  *   npm run generate:pdf -- --year=2027 --subtitle="Seconda edizione" --out=output/prova.pdf
  *
- * Premessa: se esiste il file content/premessa-<anno>.txt, il suo testo va
- * in pagina 1 (un paragrafo per blocco di righe, separati da una riga vuota).
+ * Sottotitolo della copertina: di default è l'anno accademico, calcolato
+ * dall'anno dell'edizione (2027 -> "Edizione 2026-27").
+ *
+ * Premessa (pagina 1): il testo di content/premessa-<anno>.txt se esiste,
+ * altrimenti quello di content/premessa.txt (la premessa della prima
+ * edizione). Un paragrafo per blocco di righe, separati da una riga vuota.
  *
  * Richiede POSTGRES_URL in .env.local (lo stesso usato dal sito) e la
  * dipendenza "puppeteer".
@@ -55,7 +60,8 @@ function parseArgs() {
   const year = Number(args.year || getConfiguredYear());
   return {
     year,
-    subtitle: args.subtitle || `Edizione ${year}`,
+    // Anno accademico: l'edizione 2027 raccoglie l'anno 2026-27.
+    subtitle: args.subtitle || `Edizione ${year - 1}-${String(year).slice(-2)}`,
     out: args.out || null,
   };
 }
@@ -104,6 +110,53 @@ function chunk(list, size) {
   const out = [];
   for (let i = 0; i < list.length; i += size) out.push(list.slice(i, i + size));
   return out;
+}
+
+// -----------------------------------------------------------------------
+// Impaginazione delle foto di gruppo, come nell'edizione storica: la pagina
+// è una griglia di 2 colonne x 7 righe. Le foto verticali occupano una
+// colonna per 3 righe e si alternano sinistra/destra sfalsate di 2 righe
+// (effetto "a zig-zag"); quelle orizzontali sono centrate su tutta la
+// larghezza per 2 righe. Quando una foto non entra si passa alla pagina dopo.
+// -----------------------------------------------------------------------
+const ROWS = 7;
+
+function layoutGroups(groups) {
+  const pages = [];
+  let page = [];
+  let freeFrom = 1; // prima riga libera su entrambe le colonne
+  let lastPortrait = null; // { col, start } dell'ultima foto verticale
+
+  const newPage = () => {
+    if (page.length) pages.push(page);
+    page = [];
+    freeFrom = 1;
+    lastPortrait = null;
+  };
+
+  for (const entry of groups) {
+    const wide = (entry.ratio ?? 0.75) >= 1.15;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      let item;
+      if (wide) {
+        item = { kind: "wide", col: "1 / span 2", start: freeFrom, span: 2 };
+      } else if (lastPortrait && lastPortrait.start + 2 >= freeFrom - 1) {
+        // Sfalsata rispetto alla verticale precedente, nell'altra colonna.
+        item = { kind: "portrait", col: lastPortrait.col === 1 ? 2 : 1, start: lastPortrait.start + 2, span: 3 };
+      } else {
+        item = { kind: "portrait", col: lastPortrait && lastPortrait.col === 1 ? 2 : 1, start: freeFrom, span: 3 };
+      }
+      if (item.start + item.span - 1 <= ROWS) {
+        page.push({ entry, kind: item.kind, col: String(item.col), row: `${item.start} / span ${item.span}` });
+        freeFrom = Math.max(freeFrom, item.start + item.span);
+        lastPortrait = item.kind === "portrait" ? { col: item.col, start: item.start } : null;
+        break;
+      }
+      newPage();
+    }
+  }
+  newPage();
+  return pages;
 }
 
 // -----------------------------------------------------------------------
@@ -161,14 +214,16 @@ function buildHtml({ singles, groups, subtitle, premessa, emblem, facultyIcons }
       </article>`;
   };
 
-  const groupFigure = (entry, i) => `
-    <figure class="group g${i + 1}">
+  const groupFigure = ({ entry, kind, col, row }) => `
+    <figure class="group ${kind}" style="grid-column: ${col}; grid-row: ${row};">
       <img src="${entry.imageUrl}" alt="" />
       <figcaption><span>${escapeHtml(entry.names)}</span><em>${escapeHtml(entry.caption)}</em></figcaption>
     </figure>`;
 
   const pages = [intro, ...chunk(singles, 9).map((p) => `<div class="singles">${p.map(singleCard).join("")}</div>`)];
-  const groupPages = chunk(groups, 3).map((p) => `<div class="groups">${p.map(groupFigure).join("")}</div>`);
+  const groupPages = layoutGroups(groups).map(
+    (p) => `<div class="groups">${p.map(groupFigure).join("")}</div>`
+  );
 
   const body = [
     ...pages.map((inner, i) => framedPage(i + 1, inner, i === 0 ? "intro" : "")),
@@ -204,8 +259,8 @@ function buildHtml({ singles, groups, subtitle, premessa, emblem, facultyIcons }
 
   /* --- Pagina 1: premessa e legenda ----------------------------------- */
   .intro .content { display: flex; flex-direction: column; justify-content: space-between; padding: 0 5mm; }
-  .premessa h1 { font-family: "Noto Serif", Georgia, serif; font-weight: 400; font-size: 20pt; text-align: center; margin: 0 0 5mm; color: #111; }
-  .premessa p { font-family: "Noto Serif", Georgia, serif; font-size: 10.5pt; line-height: 1.35; color: #111; margin: 0 0 4mm; }
+  .premessa h1 { font-family: "Noto Serif", Georgia, serif; font-weight: 400; font-size: 21pt; text-align: center; margin: -3mm 0 6mm; color: #111; }
+  .premessa p { font-family: "Noto Serif", Georgia, serif; font-size: 11pt; line-height: 1.22; color: #111; margin: 0 0 4.5mm; }
   .legend { margin-top: auto; padding: 0 8mm 4mm; }
   .legend h2 { font-weight: 400; font-size: 17pt; margin: 0 0 6mm; }
   .legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm 10mm; }
@@ -222,14 +277,12 @@ function buildHtml({ singles, groups, subtitle, premessa, emblem, facultyIcons }
   .single-motto { position: relative; z-index: 2; width: 39mm; min-height: 17mm; margin-top: -4.5mm; padding: 2mm 2.5mm; border-radius: 2.5mm; background: var(--navy); color: #fff; font-style: italic; font-size: 7.5pt; line-height: 1.25; text-align: center; display: flex; align-items: center; justify-content: center; }
 
   /* --- Foto di gruppo: tre per pagina, sfalsate ------------------------ */
-  .groups { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(6, 1fr); height: 100%; padding: 2mm 6mm; column-gap: 6mm; }
+  .groups { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(7, 1fr); height: 100%; padding: 2mm 4mm; column-gap: 6mm; }
   .group { margin: 0; display: table; width: 1px; justify-self: center; align-self: center; }
-  .g1 { grid-column: 1; grid-row: 1 / span 3; }
-  .g2 { grid-column: 2; grid-row: 3 / span 3; }
-  .g3 { grid-column: 1; grid-row: 5 / span 2; }
-  .group img { display: block; max-width: 78mm; max-height: 72mm; width: auto; height: auto; border-radius: 3mm 3mm 0 0; }
-  .g3 img { max-height: 52mm; }
-  .group figcaption { display: table-caption; caption-side: bottom; background: var(--navy); color: #fff; border-radius: 0 0 3mm 3mm; padding: 1.5mm 3mm 2mm; font-size: 8.5pt; line-height: 1.25; text-align: center; }
+  .group img { display: block; width: auto; height: auto; border-radius: 3mm 3mm 0 0; }
+  .group.portrait img { max-width: 74mm; max-height: 78mm; }
+  .group.wide img { max-width: 150mm; max-height: 48mm; }
+  .group figcaption { display: table-caption; caption-side: bottom; background: var(--navy); color: #fff; border-radius: 0 0 3mm 3mm; padding: 1.5mm 3mm 2mm; font-size: 9pt; line-height: 1.25; text-align: center; }
   .group figcaption span, .group figcaption em { display: block; }
 </style>
 </head>
@@ -280,10 +333,10 @@ async function main() {
     if (fs.existsSync(iconPath)) facultyIcons[key] = fileToDataUri(iconPath);
   }
 
-  const premessaPath = path.join(PROJECT_ROOT, `content/premessa-${year}.txt`);
-  const premessa = fs.existsSync(premessaPath) ? fs.readFileSync(premessaPath, "utf8") : "";
-
-  const html = buildHtml({ singles, groups, subtitle, premessa, emblem, facultyIcons });
+  const premessaPath = [`content/premessa-${year}.txt`, "content/premessa.txt"]
+    .map((p) => path.join(PROJECT_ROOT, p))
+    .find((p) => fs.existsSync(p));
+  const premessa = premessaPath ? fs.readFileSync(premessaPath, "utf8") : "";
 
   const outputPath = out || path.join(PROJECT_ROOT, `output/annuario-del-pn-${year}.pdf`);
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
@@ -293,6 +346,26 @@ async function main() {
   const browser = await puppeteer.launch({ headless: true });
   try {
     const page = await browser.newPage();
+    // Proporzioni delle foto di gruppo (larghezza/altezza), per decidere
+    // se impaginarle come verticali o orizzontali.
+    const ratios = await page.evaluate(
+      (urls) =>
+        Promise.all(
+          urls.map(
+            (u) =>
+              new Promise((r) => {
+                const img = new Image();
+                img.onload = () => r(img.naturalWidth / img.naturalHeight);
+                img.onerror = () => r(0.75);
+                img.src = u;
+              })
+          )
+        ),
+      groups.map((g) => g.imageUrl)
+    );
+    groups.forEach((g, i) => (g.ratio = ratios[i]));
+
+    const html = buildHtml({ singles, groups, subtitle, premessa, emblem, facultyIcons });
     await page.setContent(html, { waitUntil: "networkidle0", timeout: 180000 });
     // Aspetta che tutte le foto (scaricate da Vercel Blob) siano pronte.
     await page.evaluate(() =>
@@ -327,4 +400,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { buildHtml, extractSurname, splitName, getConfiguredYear };
+module.exports = { buildHtml, layoutGroups, extractSurname, splitName, getConfiguredYear };

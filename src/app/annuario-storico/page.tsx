@@ -17,7 +17,7 @@ async function getInitialEntries() {
         )
       )
       .orderBy(desc(schema.hallOfFameEntries.createdAt))
-      .limit(60);
+      .limit(1000);
   } catch (err) {
     console.error("Impossibile leggere hall_of_fame_entries (storico):", err);
     return [];
@@ -25,8 +25,7 @@ async function getInitialEntries() {
 }
 
 export default async function AnnuarioStoricoPage() {
-  // Selezione per recenza (le 60 più nuove), ma mostrate in ordine
-  // alfabetico per cognome.
+  // Tutte le schede approvate, mostrate in ordine alfabetico per cognome.
   const entries = sortEntriesBySurname(await getInitialEntries());
 
   return (
@@ -47,6 +46,7 @@ export default async function AnnuarioStoricoPage() {
         initialEntries={entries}
         modalEyebrow="Annuario Storico"
         submitLabel="Pubblica nell'Annuario Storico"
+        variant="yearbook"
       />
     </div>
   );
