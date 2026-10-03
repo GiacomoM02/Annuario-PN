@@ -8,7 +8,9 @@ export const runtime = "nodejs";
 // (anche su schermi ad alta densità), ma non è l'originale.
 const DISPLAY_SIDE = 800;
 
-const notFound = () => new Response("Not found", { status: 404 });
+// Mai in cache: altrimenti un errore momentaneo resterebbe nel browser.
+const notFound = () =>
+  new Response("Not found", { status: 404, headers: { "Cache-Control": "no-store" } });
 
 /**
  * Versione ridotta di una foto, solo se APPROVATA e di una galleria

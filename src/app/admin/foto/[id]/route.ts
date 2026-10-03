@@ -10,12 +10,14 @@ export const runtime = "nodejs";
  */
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!(await verifySessionToken((await cookies()).get(ADMIN_COOKIE)?.value))) {
-    return new Response("Unauthorized", { status: 401 });
+    return new Response("Unauthorized", { status: 401, headers: { "Cache-Control": "no-store" } });
   }
   const { id } = await params;
   const photo = await findPhoto(id);
   const original = photo && (await readPhoto(photo.imageUrl));
-  if (!original) return new Response("Not found", { status: 404 });
+  if (!original) {
+    return new Response("Not found", { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
 
   return new Response(new Uint8Array(original), {
     headers: {
