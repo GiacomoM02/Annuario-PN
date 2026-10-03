@@ -1,4 +1,14 @@
-import { pgTable, uuid, text, timestamp, pgEnum, integer } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import {
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  pgEnum,
+  integer,
+  smallint,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 
 // ---------------------------------------------------------------------------
 // ENUM: tipologia scheda, sezione, facoltà (solo foto singole) e stato
@@ -52,10 +62,18 @@ export const hallOfFameEntries = pgTable("hall_of_fame_entries", {
   editionYear: integer("edition_year"),
   // Solo per l'Archivio: HMAC dell'email di chi ha inviato la foto.
   submitterHash: text("submitter_hash"),
+  // Solo per l'Archivio: "posto" occupato dall'invio (1..limite per tipo).
+  // Con l'indice unico qui sotto garantisce il limite di invii per persona
+  // anche con richieste simultanee (vedi createEditionEntryAction).
+  submissionSlot: smallint("submission_slot"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-});
+}, (t) => ({
+  submitterSlotUnique: uniqueIndex("hall_of_fame_entries_submitter_slot_uq")
+    .on(t.editionYear, t.submitterHash, t.type, t.submissionSlot)
+    .where(sql`section = 'ARCHIVIO'`),
+}));
 
 export type HallOfFameEntry = typeof hallOfFameEntries.$inferSelect;
 export type NewHallOfFameEntry = typeof hallOfFameEntries.$inferInsert;

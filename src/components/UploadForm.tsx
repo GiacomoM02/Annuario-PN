@@ -11,7 +11,6 @@ import {
 import { facultyOptions } from "@/lib/faculties";
 import { SINGLE_CAPTION_MAX } from "@/lib/validations";
 import { cn } from "@/lib/utils";
-import type { HallOfFameEntry } from "../../drizzle/schema";
 
 type Step = "email" | "details" | "success";
 type PhotoType = "SINGLE" | "GROUP";
@@ -27,7 +26,7 @@ type PhotoType = "SINGLE" | "GROUP";
 export function UploadForm(
   props: {
     submitLabel?: string;
-    onUploaded: (entry: HallOfFameEntry) => void;
+    onUploaded: () => void;
   } & (
     | { mode: "gallery"; section: GallerySection }
     | { mode: "edition"; year: number }
@@ -39,7 +38,9 @@ export function UploadForm(
   const [photoType, setPhotoType] = useState<PhotoType>("SINGLE");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const [lastEntry, setLastEntry] = useState<HallOfFameEntry | null>(null);
+  // Nome inviato, per il messaggio di conferma (le azioni non restituiscono
+  // la scheda salvata).
+  const [submittedName, setSubmittedName] = useState("");
 
   const isEdition = props.mode === "edition";
   const isSingle = !isEdition || photoType === "SINGLE";
@@ -69,7 +70,7 @@ export function UploadForm(
           ? await createEditionEntryAction(formData)
           : await createGalleryEntryAction(props.section, formData);
       if (!result.ok) return setError(result.error);
-      setLastEntry(result.data);
+      setSubmittedName(String(formData.get("names") ?? ""));
       setStep("success");
     });
   }
@@ -226,7 +227,7 @@ export function UploadForm(
         </form>
       )}
 
-      {step === "success" && lastEntry && (
+      {step === "success" && (
         <div className="flex flex-col items-center gap-3 py-6 text-center">
           <CheckCircle2 className="text-unipi-500" size={36} />
           <h3 className="font-display text-lg font-semibold text-ink-950">
@@ -235,11 +236,11 @@ export function UploadForm(
           <p className="max-w-sm text-sm text-ink-700">
             {props.mode === "edition"
               ? `Grazie! La tua foto è in attesa di verifica: una volta approvata, finirà nell'Annuario ${props.year}.`
-              : `Grazie ${lastEntry.names.split(",")[0]}. La tua foto è in attesa di approvazione: comparirà nella galleria non appena il team l'avrà verificata.`}
+              : `Grazie ${submittedName.split(",")[0].trim()}. La tua foto è in attesa di approvazione: comparirà nella galleria non appena il team l'avrà verificata.`}
           </p>
           <button
             type="button"
-            onClick={() => onUploaded(lastEntry)}
+            onClick={() => onUploaded()}
             className="mt-2 rounded-full bg-unipi-500 px-6 py-2.5 text-sm font-medium text-paper-50 transition hover:bg-unipi-600"
           >
             Fatto

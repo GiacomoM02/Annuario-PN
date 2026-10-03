@@ -1,11 +1,11 @@
 import Image from "next/image";
 import { facultyOptions } from "@/lib/faculties";
-import type { HallOfFameEntry } from "../../drizzle/schema";
+import type { PublicEntry } from "@/lib/public-entries";
 
 // Scheda delle gallerie (Hall of Fame e Annuario Storico): foto, icona della
 // facoltà e nome, come nelle pagine dell'annuario, più l'eventuale
 // didascalia (solo Annuario Storico).
-export function PhotoCard({ entry }: { entry: HallOfFameEntry }) {
+export function PhotoCard({ entry }: { entry: PublicEntry }) {
   const faculty = facultyOptions.find((f) => f.value === entry.faculty);
 
   return (

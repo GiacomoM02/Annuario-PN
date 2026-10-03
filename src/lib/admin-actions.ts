@@ -8,10 +8,11 @@ import { del } from "@vercel/blob";
 import { db, schema } from "@/lib/db";
 import {
   ADMIN_COOKIE,
-  SESSION_DAYS,
+  SESSION_HOURS,
+  adminCookieOptions,
   createSessionToken,
   isAdminConfigured,
-  safeEqual,
+  verifyPassword,
   verifySessionToken,
 } from "@/lib/admin-auth";
 
@@ -38,26 +39,25 @@ export async function loginAction(
   formData: FormData
 ): Promise<{ error: string | null }> {
   if (!isAdminConfigured()) {
-    return { error: "Pannello non configurato: manca la variabile ADMIN_PASSWORD." };
+    return { error: "Pannello non configurato: manca la variabile ADMIN_PASSWORD_HASH." };
   }
   const password = String(formData.get("password") ?? "");
-  if (!safeEqual(password, process.env.ADMIN_PASSWORD!)) {
+  if (!(await verifyPassword(password))) {
     // Piccolo ritardo per rallentare i tentativi a raffica.
     await new Promise((r) => setTimeout(r, 800));
     return { error: "Password non corretta." };
   }
   cookies().set(ADMIN_COOKIE, await createSessionToken(), {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_DAYS * 24 * 60 * 60,
+    ...adminCookieOptions,
+    maxAge: SESSION_HOURS * 60 * 60,
   });
   redirect("/admin");
 }
 
 export async function logoutAction() {
-  cookies().delete(ADMIN_COOKIE);
+  // Stessi attributi del login: un cookie __Host- senza Secure e Path=/
+  // verrebbe ignorato dal browser e la sessione resterebbe attiva.
+  cookies().set(ADMIN_COOKIE, "", { ...adminCookieOptions, maxAge: 0 });
   redirect("/admin/login");
 }
 

@@ -1,5 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
-import { db, schema } from "@/lib/db";
+import { getApprovedEntries } from "@/lib/public-entries";
 import { GalleryBoard } from "@/components/GalleryBoard";
 import { sortEntriesBySurname } from "@/lib/sort-entries";
 
@@ -7,17 +6,7 @@ export const dynamic = "force-dynamic"; // sempre dati freschi: pagina "viva"
 
 async function getInitialEntries() {
   try {
-    return await db
-      .select()
-      .from(schema.hallOfFameEntries)
-      .where(
-        and(
-          eq(schema.hallOfFameEntries.section, "ANNUARIO_STORICO"),
-          eq(schema.hallOfFameEntries.status, "APPROVED")
-        )
-      )
-      .orderBy(desc(schema.hallOfFameEntries.createdAt))
-      .limit(1000);
+    return await getApprovedEntries("ANNUARIO_STORICO");
   } catch (err) {
     console.error("Impossibile leggere hall_of_fame_entries (storico):", err);
     return [];

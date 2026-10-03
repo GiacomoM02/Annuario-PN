@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { facultyOptions } from "@/lib/faculties";
 import { splitName } from "@/lib/sort-entries";
-import type { HallOfFameEntry } from "../../drizzle/schema";
+import type { PublicEntry } from "@/lib/public-entries";
 
 /**
  * Scheda nello stesso formato delle pagine dell'annuario (vedi la prima
@@ -10,7 +10,7 @@ import type { HallOfFameEntry } from "../../drizzle/schema";
  * riquadro bordato, didascalia in un'etichetta blu (solo se presente: la
  * Hall of Fame non la usa).
  */
-export function YearbookCard({ entry }: { entry: HallOfFameEntry }) {
+export function YearbookCard({ entry }: { entry: PublicEntry }) {
   const faculty = facultyOptions.find((f) => f.value === entry.faculty);
   const { given, surname } = splitName(entry.names);
 

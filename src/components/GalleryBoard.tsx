@@ -11,7 +11,7 @@ import {
   type GallerySection,
 } from "@/lib/gallery-actions";
 import { sortEntriesBySurname } from "@/lib/sort-entries";
-import type { HallOfFameEntry } from "../../drizzle/schema";
+import type { PublicEntry } from "@/lib/public-entries";
 
 const POLL_INTERVAL_MS = 15000;
 
@@ -29,7 +29,7 @@ export function GalleryBoard({
   variant = "default",
 }: {
   section: GallerySection;
-  initialEntries: HallOfFameEntry[];
+  initialEntries: PublicEntry[];
   addButtonLabel?: string;
   modalEyebrow: string;
   submitLabel: string;
