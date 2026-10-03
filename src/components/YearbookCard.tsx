@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { facultyOptions } from "@/lib/faculties";
 import { splitName } from "@/lib/sort-entries";
+import { publicPhotoSrc } from "@/lib/photo-src";
 import type { PublicEntry } from "@/lib/public-entries";
 
 /**
@@ -18,10 +19,12 @@ export function YearbookCard({ entry }: { entry: PublicEntry }) {
     <article className="mx-auto flex w-full max-w-[15rem] flex-col items-center text-yearbook">
       <div className="relative z-10 aspect-square w-[88%]">
         <Image
-          src={entry.imageUrl}
+          src={publicPhotoSrc(entry.id)}
           alt={entry.names}
           fill
-          sizes="(min-width: 1024px) 220px, (min-width: 640px) 30vw, 45vw"
+          // La versione ridotta arriva già pronta da /foto/<id>.
+          unoptimized
+          draggable={false}
           className="rounded-xl object-cover"
         />
         {faculty && (

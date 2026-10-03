@@ -1,25 +1,13 @@
-// Dominio pubblico dello store Vercel Blob del progetto, ricavato dal token
-// (formato vercel_blob_rw_<idStore>_<segreto>): solo le immagini di QUESTO
-// store passano dall'ottimizzatore di next/image, non quelle di qualsiasi
-// altro cliente Vercel. L'id dello store non è segreto: compare già in
-// ogni URL pubblico delle foto.
-const blobStoreId = process.env.BLOB_READ_WRITE_TOKEN?.split("_")[3];
-const BLOB_HOST = blobStoreId
-  ? `${blobStoreId.toLowerCase()}.public.blob.vercel-storage.com`
-  : null;
-if (!BLOB_HOST) {
-  console.warn("BLOB_READ_WRITE_TOKEN mancante: le foto da Vercel Blob non verranno mostrate.");
-}
-
 const isDev = process.env.NODE_ENV !== "production";
 
-// Content Security Policy: il sito carica solo risorse proprie e le foto
-// dello store Blob; nessuno può incorporarlo in un iframe (clickjacking).
+// Content Security Policy: il sito carica solo risorse proprie (anche le
+// foto, servite da /foto e /admin/foto: gli indirizzi su Vercel Blob non
+// arrivano mai al browser); nessuno può incorporarlo in un iframe.
 // Next usa script inline, da cui 'unsafe-inline'; in sviluppo servono anche
 // 'unsafe-eval' e i WebSocket per il ricaricamento automatico.
 const csp = [
   "default-src 'self'",
-  `img-src 'self' data: blob:${BLOB_HOST ? ` https://${BLOB_HOST}` : ""}`,
+  "img-src 'self' data: blob:",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self'",
@@ -42,8 +30,9 @@ const securityHeaders = [
 const nextConfig = {
   // Non dichiarare la tecnologia usata (header X-Powered-By).
   poweredByHeader: false,
+  // Nessuna immagine esterna passa dall'ottimizzatore di next/image.
   images: {
-    remotePatterns: BLOB_HOST ? [{ protocol: "https", hostname: BLOB_HOST }] : [],
+    remotePatterns: [],
   },
   experimental: {
     serverActions: {

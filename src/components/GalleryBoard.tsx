@@ -63,8 +63,15 @@ export function GalleryBoard({
     setIsModalOpen(false);
   }, []);
 
+  // Scoraggia il salvataggio delle foto (tasto destro, pressione lunga su
+  // telefono). Non impedisce uno screenshot: è solo un deterrente, mentre gli
+  // originali restano comunque accessibili solo all'admin.
+  const blockImageMenu = useCallback((e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).tagName === "IMG") e.preventDefault();
+  }, []);
+
   return (
-    <div>
+    <div onContextMenu={blockImageMenu} className="[&_img]:select-none [&_img]:[-webkit-touch-callout:none]">
       <div className="mt-10 flex items-center justify-between">
         <p className="text-sm text-ink-700">
           {entries.length} {entries.length === 1 ? "scheda" : "schede"} finora

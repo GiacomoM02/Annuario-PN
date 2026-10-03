@@ -69,11 +69,11 @@ export const hallOfFameEntries = pgTable("hall_of_fame_entries", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-}, (t) => ({
-  submitterSlotUnique: uniqueIndex("hall_of_fame_entries_submitter_slot_uq")
+}, (t) => [
+  uniqueIndex("hall_of_fame_entries_submitter_slot_uq")
     .on(t.editionYear, t.submitterHash, t.type, t.submissionSlot)
     .where(sql`section = 'ARCHIVIO'`),
-}));
+]);
 
 export type HallOfFameEntry = typeof hallOfFameEntries.$inferSelect;
 export type NewHallOfFameEntry = typeof hallOfFameEntries.$inferInsert;

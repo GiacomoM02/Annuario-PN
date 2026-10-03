@@ -11,14 +11,14 @@ export function isPublicSection(value: unknown): value is GallerySection {
 }
 
 // Solo i campi che servono alle gallerie: niente stato di moderazione,
-// anno dell'edizione o impronta dell'email.
+// anno dell'edizione, impronta dell'email e nemmeno l'indirizzo del file su
+// Blob (le foto si mostrano tramite /foto/<id>, vedi src/lib/photos.ts).
 const t = schema.hallOfFameEntries;
 const publicColumns = {
   id: t.id,
   faculty: t.faculty,
   names: t.names,
   caption: t.caption,
-  imageUrl: t.imageUrl,
   createdAt: t.createdAt,
 };
 
@@ -27,7 +27,6 @@ export type PublicEntry = {
   faculty: (typeof t.$inferSelect)["faculty"];
   names: string;
   caption: string | null;
-  imageUrl: string;
   createdAt: Date;
 };
 

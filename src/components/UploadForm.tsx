@@ -203,11 +203,11 @@ export function UploadForm(
               </Field>
             ))}
 
-          <Field label="Immagine (max 5MB)">
+          <Field label="Immagine JPG, PNG o WebP (max 5MB)">
             <input
               type="file"
               name="image"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               required
               className="block w-full text-sm text-ink-700 file:mr-3 file:rounded-full file:border-0 file:bg-ink-950 file:px-4 file:py-2 file:text-xs file:font-medium file:text-paper-50"
             />

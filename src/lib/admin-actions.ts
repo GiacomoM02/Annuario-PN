@@ -19,7 +19,7 @@ import {
 // Ogni azione del pannello ricontrolla la sessione: il middleware protegge
 // le pagine, ma le Server Actions sono endpoint richiamabili a parte.
 async function requireAdmin() {
-  if (!(await verifySessionToken(cookies().get(ADMIN_COOKIE)?.value))) {
+  if (!(await verifySessionToken((await cookies()).get(ADMIN_COOKIE)?.value))) {
     redirect("/admin/login");
   }
 }
@@ -47,7 +47,7 @@ export async function loginAction(
     await new Promise((r) => setTimeout(r, 800));
     return { error: "Password non corretta." };
   }
-  cookies().set(ADMIN_COOKIE, await createSessionToken(), {
+  (await cookies()).set(ADMIN_COOKIE, await createSessionToken(), {
     ...adminCookieOptions,
     maxAge: SESSION_HOURS * 60 * 60,
   });
@@ -57,7 +57,7 @@ export async function loginAction(
 export async function logoutAction() {
   // Stessi attributi del login: un cookie __Host- senza Secure e Path=/
   // verrebbe ignorato dal browser e la sessione resterebbe attiva.
-  cookies().set(ADMIN_COOKIE, "", { ...adminCookieOptions, maxAge: 0 });
+  (await cookies()).set(ADMIN_COOKIE, "", { ...adminCookieOptions, maxAge: 0 });
   redirect("/admin/login");
 }
 

@@ -43,11 +43,10 @@ function formatDate(date: Date) {
   }).format(new Date(date));
 }
 
-export default async function AdminPage({
-  searchParams,
-}: {
-  searchParams: { section?: string; status?: string };
+export default async function AdminPage(props: {
+  searchParams: Promise<{ section?: string; status?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   const section =
     SECTIONS.find((s) => s.value === searchParams.section)?.value ?? "HALL_OF_FAME";
   const status =
@@ -174,9 +173,9 @@ function AdminEntryCard({ entry }: { entry: HallOfFameEntry }) {
 
   return (
     <article className="overflow-hidden rounded-lg border border-unipi-100 bg-paper-50 shadow-sm">
-      <a href={entry.imageUrl} target="_blank" rel="noopener noreferrer" title="Apri l'immagine originale">
+      <a href={`/admin/foto/${entry.id}`} target="_blank" rel="noopener noreferrer" title="Apri l'immagine originale">
         <div className="relative aspect-[4/5] bg-unipi-700">
-          <img src={entry.imageUrl} alt={entry.names} className="h-full w-full object-cover" />
+          <img src={`/admin/foto/${entry.id}`} alt={entry.names} loading="lazy" className="h-full w-full object-cover" />
           {entry.type === "GROUP" ? (
             <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-unipi-700/90 px-2.5 py-1 text-[11px] font-medium text-paper-50">
               <Users size={12} />
