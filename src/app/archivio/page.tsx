@@ -21,7 +21,7 @@ export default function ArchivioPage() {
     currentEditionConfig;
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-16">
+    <div className="mx-auto max-w-7xl px-6 py-16">
       <p className="eyebrow">Edizioni passate</p>
       <h1 className="mt-2 font-display text-4xl font-semibold text-unipi-700">
         Archivio

@@ -19,15 +19,15 @@
 
   /* Da desktop tutto il sito scala in proporzione allo schermo: le misure
      di Tailwind sono in rem, quindi basta far variare la dimensione base del
-     testo. Riferimento: finestra 1920x950 (monitor Full HD) = 16px, cioè
-     esattamente com'era prima su quel monitor. Su schermi più grandi tutto
-     cresce (niente fasce bianche di troppo), su quelli più piccoli tutto si
-     riduce insieme (niente effetto "zoomato"). Si usa il minore tra
-     larghezza e altezza, così la home resta sempre in una schermata.
-     Telefono e tablet (sotto i 1024px) restano a 16px. */
+     testo. Riferimento: finestra di un portatile da 15" (1536x730 con lo
+     zoom di Windows al 125%) = 16px, l'aspetto originale del sito. Sugli
+     schermi più grandi tutto cresce nelle stesse proporzioni, su quelli più
+     piccoli si riduce. Si usa il minore tra larghezza e altezza, così la
+     home resta in una schermata. Telefono e tablet (sotto i 1024px)
+     restano a 16px. */
   @media (min-width: 1024px) {
     html {
-      font-size: clamp(12px, min(0.8333vw, 1.684vh), 32px);
+      font-size: clamp(13px, min(1.0417vw, 2.19vh), 40px);
     }
   }
 

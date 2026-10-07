@@ -1,7 +1,7 @@
 export function Footer() {
   return (
     <footer className="border-t border-ink-950/10 bg-ink-950 text-paper-100">
-      <div className="mx-auto max-w-6xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-6 py-10">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-display text-lg italic">Annuario del PN</p>

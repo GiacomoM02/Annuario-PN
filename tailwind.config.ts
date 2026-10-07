@@ -63,12 +63,6 @@ const config: Config = {
       maxWidth: {
         prose: "68ch",
       },
-      screens: {
-        // Disposizione ariosa della home, su tutti i desktop: da quando il
-        // sito scala con lo schermo (vedi globals.css) entra sempre in una
-        // schermata, quindi la variante compatta "lg:" non serve più.
-        tall: { raw: "(min-width: 1024px)" },
-      },
     },
   },
   plugins: [],

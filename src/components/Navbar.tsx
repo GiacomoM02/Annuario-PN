@@ -20,18 +20,18 @@ export function Navbar() {
   if (isHome) {
     return (
       <header className="absolute inset-x-0 top-0 z-20 lg:grid lg:grid-cols-2">
-        <div className="pt-4 tall:pt-5">
+        <div className="pt-4">
           {/* Stessa colonna del contenuto della home (max-w-xl centrata),
               così logo e testo restano allineati a ogni larghezza. */}
           <div className="mx-auto max-w-xl px-6 lg:px-10">
             <Affiliation light />
-            <div className="mt-3 lg:mt-5 tall:mt-7">
+            <div className="mt-3 lg:mt-5">
               <Brand light />
             </div>
             <NavLinks tone="panel" pathname={pathname} className="mt-3 lg:hidden" />
           </div>
         </div>
-        <div className="hidden justify-end px-10 pt-8 lg:flex tall:pt-10">
+        <div className="hidden justify-end px-10 pt-8 lg:flex">
           <NavLinks tone="photo" pathname={pathname} />
         </div>
       </header>
@@ -40,7 +40,7 @@ export function Navbar() {
 
   return (
     <header className="border-b border-ink-950/10 bg-paper-50/90 backdrop-blur">
-      <div className="mx-auto max-w-6xl px-6 pb-4 pt-3">
+      <div className="mx-auto max-w-7xl px-6 pb-4 pt-3">
         <Affiliation />
         <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
           <Brand />
@@ -85,7 +85,7 @@ function Affiliation({ light = false }: { light?: boolean }) {
 }
 
 function Brand({ light = false }: { light?: boolean }) {
-  const size = light ? "text-2xl lg:text-[2rem] tall:text-[2.5rem]" : "text-lg";
+  const size = light ? "text-2xl lg:text-[2rem]" : "text-lg";
   return (
     <Link href="/" className="group flex items-baseline gap-2">
       <span

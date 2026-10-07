@@ -16,55 +16,55 @@ export default function HomePage() {
       {/* Colonna sinistra: emblema, titolo, tasti e "Come partecipare",
           centrati nello spazio sotto la navbar (my-auto: se non c'è spazio
           a sufficienza il contenuto parte dall'alto invece di tagliarsi). */}
-      <section className="hero-panel relative flex items-center lg:flex-col lg:items-stretch lg:pb-5 lg:pt-[6.75rem] tall:pt-36">
-        <div className="relative mx-auto w-full max-w-xl px-6 pb-14 pt-36 lg:my-auto lg:px-10 lg:py-0 tall:my-0">
+      <section className="hero-panel relative flex items-center lg:flex-col lg:items-stretch lg:pb-5 lg:pt-[6.75rem]">
+        <div className="relative mx-auto w-full max-w-xl px-6 pb-14 pt-36 lg:my-auto lg:px-10 lg:py-0">
           {/* Emblema "Annuario del PN" (Cherubino). */}
           <img
             src="/brand/cherubino-annuario.jpg"
             alt="Annuario del PN"
-            className="h-20 w-20 rounded-full shadow-sm sm:h-24 sm:w-24 lg:h-24 lg:w-24 xl:h-28 xl:w-28 tall:h-[8.5rem] tall:w-[8.5rem]"
+            className="h-20 w-20 rounded-full shadow-sm sm:h-24 sm:w-24 lg:h-24 lg:w-24 xl:h-28 xl:w-28"
           />
 
-          <h1 className="mt-4 font-display text-3xl font-semibold leading-[1.1] text-hero-fg sm:text-4xl lg:text-[1.75rem] xl:text-[2rem] tall:mt-5 tall:text-4xl">
+          <h1 className="mt-4 font-display text-3xl font-semibold leading-[1.1] text-hero-fg sm:text-4xl lg:text-[1.75rem] xl:text-[2rem]">
             Volti, nomi e momenti che rendono unico{" "}
             <span className="italic text-hero-accent">il nostro polo.</span>
           </h1>
-          <p className="mt-5 text-base text-hero-fg/80 sm:text-lg lg:mt-3 lg:text-[0.95rem] lg:leading-relaxed tall:mt-5 tall:text-lg">
+          <p className="mt-5 text-base text-hero-fg/80 sm:text-lg lg:mt-3 lg:text-[0.95rem] lg:leading-relaxed">
             {siteConfig.name} raccoglie, edizione dopo edizione, chi ha
             abitato questi corridoi. Sfoglia le edizioni passate, manda la
             tua foto per l'annuario o, se ti sei laureato, entra nella Hall
             of Fame.
           </p>
 
-          <div className="mt-7 flex flex-wrap gap-3 lg:mt-5 lg:gap-2.5 tall:mt-7 tall:gap-3">
+          <div className="mt-7 flex flex-wrap gap-3 lg:mt-5 lg:gap-2.5">
             <Link
               href="/archivio"
-              className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base lg:px-5 lg:py-2.5 lg:text-sm tall:px-6 tall:py-3 tall:text-base"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base lg:px-5 lg:py-2.5 lg:text-sm"
             >
               <BookOpen className="h-4 w-4" />
               Archivio
             </Link>
             <Link
               href="/hall-of-fame"
-              className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base lg:px-5 lg:py-2.5 lg:text-sm tall:px-6 tall:py-3 tall:text-base"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base lg:px-5 lg:py-2.5 lg:text-sm"
             >
               <GraduationCap className="h-4 w-4" />
               Hall of Fame
             </Link>
             <Link
               href="/annuario-storico"
-              className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base lg:px-5 lg:py-2.5 lg:text-sm tall:px-6 tall:py-3 tall:text-base"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base lg:px-5 lg:py-2.5 lg:text-sm"
             >
               <ScrollText className="h-4 w-4" />
               Annuario Storico
             </Link>
           </div>
 
-          <div className="mt-10 border-t border-hero-fg/15 pt-6 lg:mt-6 lg:pt-4 tall:mt-10 tall:pt-6">
+          <div className="mt-10 border-t border-hero-fg/15 pt-6 lg:mt-6 lg:pt-4">
             <p className="text-xs font-medium uppercase tracking-wider text-hero-accent-deep">
               Come partecipare
             </p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:mt-3 tall:mt-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:mt-3">
               <MiniStep
                 icon={<Mail className="h-3.5 w-3.5" />}
                 title="Email istituzionale"
