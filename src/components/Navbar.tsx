@@ -20,19 +20,29 @@ export function Navbar() {
   if (isHome) {
     return (
       <header className="absolute inset-x-0 top-0 z-20 lg:grid lg:grid-cols-2">
-        <div className="pt-4">
-          {/* Stessa colonna del contenuto della home (max-w-xl centrata),
-              così logo e testo restano allineati a ogni larghezza. */}
+        <div className="pt-4 lg:pt-8">
+          {/* Stessa colonna del contenuto della home (max-w centrata), così
+              logo e testo restano allineati a ogni larghezza. */}
           <div className="mx-auto max-w-xl px-6 lg:max-w-[45rem] lg:px-10">
-            <Affiliation light />
-            <div className="mt-3 lg:mt-5">
-              <Brand light />
+            {/* Marchio: emblema accanto al nome (l'emblema non si ripete
+                più nella colonna sotto). */}
+            <div className="flex items-center gap-3 lg:gap-4">
+              <img src="/brand/cherubino-annuario.jpg" alt="" className="h-12 w-12 rounded-full shadow-sm lg:h-16 lg:w-16" />
+              <div>
+                <Affiliation light />
+                <div className="mt-1">
+                  <Brand light />
+                </div>
+              </div>
             </div>
             <NavLinks tone="panel" pathname={pathname} className="mt-3 lg:hidden" />
           </div>
         </div>
         <div className="hidden justify-end px-10 pt-8 lg:flex">
-          <NavLinks tone="photo" pathname={pathname} />
+          {/* Alta quanto l'emblema (h-16): la pillola resta centrata sul logo. */}
+          <div className="flex h-16 items-center">
+            <NavLinks tone="photo" pathname={pathname} />
+          </div>
         </div>
       </header>
     );
