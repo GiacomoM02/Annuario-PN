@@ -40,7 +40,7 @@ export function YearbookCard({ entry }: { entry: PublicEntry }) {
       {/* Senza didascalia (Hall of Fame) il riquadro del nome chiude la scheda:
           meno spazio sotto, visto che non c'è l'etichetta blu sovrapposta. */}
       <div
-        className={`-mt-3 flex w-full flex-col rounded-xl border-2 border-yearbook bg-paper-50 px-2 pt-5 text-center text-[15px] leading-tight ${
+        className={`-mt-3 flex w-full flex-col rounded-xl border-2 border-yearbook bg-paper-50 px-2 pt-5 text-center text-[0.9375rem] leading-tight ${
           entry.caption ? "pb-6" : "pb-3"
         }`}
       >
@@ -49,7 +49,7 @@ export function YearbookCard({ entry }: { entry: PublicEntry }) {
       </div>
 
       {entry.caption && (
-        <p className="relative z-10 -mt-4 flex min-h-[4.5rem] w-[88%] items-center justify-center rounded-xl bg-yearbook px-3 py-2 text-center text-[13px] italic leading-snug text-paper-50">
+        <p className="relative z-10 -mt-4 flex min-h-[4.5rem] w-[88%] items-center justify-center rounded-xl bg-yearbook px-3 py-2 text-center text-[0.8125rem] italic leading-snug text-paper-50">
           {entry.caption}
         </p>
       )}

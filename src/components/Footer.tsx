@@ -5,7 +5,7 @@ export function Footer() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-display text-lg italic">Annuario del PN</p>
-            <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-unipi-400/50 bg-unipi-500/20 px-2.5 py-0.5 text-[10px] font-medium text-paper-50">
+            <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-unipi-400/50 bg-unipi-500/20 px-2.5 py-0.5 text-[0.625rem] font-medium text-paper-50">
               Università di Pisa — Polo Porta Nuova
             </span>
           </div>

@@ -44,12 +44,12 @@ export function CurrentEditionCard() {
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         {open ? (
           <Link href="/archivio#invia" className={buttonClass}>
-            <Camera size={16} />
+            <Camera className="h-4 w-4" />
             Invia la tua foto
           </Link>
         ) : latest ? (
           <a href={latest.pdfUrl} download className={buttonClass}>
-            <Download size={16} />
+            <Download className="h-4 w-4" />
             Scarica l'ultima edizione
           </a>
         ) : null}
@@ -58,7 +58,7 @@ export function CurrentEditionCard() {
           className="inline-flex items-center gap-1.5 text-sm font-medium text-hero-band-fg/90 underline-offset-4 transition hover:text-hero-band-fg hover:underline"
         >
           Edizioni passate
-          <ArrowRight size={14} />
+          <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
     </div>

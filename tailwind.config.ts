@@ -64,10 +64,10 @@ const config: Config = {
         prose: "68ch",
       },
       screens: {
-        // Desktop con schermo alto: la home usa la disposizione più ariosa,
-        // che lì entra comunque tutta in una schermata. Sotto (laptop più
-        // bassi) resta quella compatta definita con "lg:".
-        tall: { raw: "(min-width: 1280px) and (min-height: 800px)" },
+        // Disposizione ariosa della home, su tutti i desktop: da quando il
+        // sito scala con lo schermo (vedi globals.css) entra sempre in una
+        // schermata, quindi la variante compatta "lg:" non serve più.
+        tall: { raw: "(min-width: 1024px)" },
       },
     },
   },

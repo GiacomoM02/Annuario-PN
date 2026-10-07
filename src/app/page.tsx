@@ -10,9 +10,9 @@ export const dynamic = "force-dynamic";
 
 export default function HomePage() {
   return (
-    // Da desktop la hero occupa esattamente uno schermo (sotto i 600px di
-    // altezza si scorre): tutto il contenuto resta visibile senza scroll.
-    <div className="lg:grid lg:h-[100svh] lg:min-h-[600px] lg:grid-cols-2">
+    // Da desktop la hero occupa uno schermo intero; se il contenuto non ci
+    // sta (finestre molto basse) la hero si allunga invece di tagliarlo.
+    <div className="lg:grid lg:min-h-[100svh] lg:grid-cols-2">
       {/* Colonna sinistra: emblema, titolo, tasti e "Come partecipare",
           centrati nello spazio sotto la navbar (my-auto: se non c'è spazio
           a sufficienza il contenuto parte dall'alto invece di tagliarsi). */}
@@ -41,21 +41,21 @@ export default function HomePage() {
               href="/archivio"
               className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base lg:px-5 lg:py-2.5 lg:text-sm tall:px-6 tall:py-3 tall:text-base"
             >
-              <BookOpen size={16} />
+              <BookOpen className="h-4 w-4" />
               Archivio
             </Link>
             <Link
               href="/hall-of-fame"
               className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base lg:px-5 lg:py-2.5 lg:text-sm tall:px-6 tall:py-3 tall:text-base"
             >
-              <GraduationCap size={16} />
+              <GraduationCap className="h-4 w-4" />
               Hall of Fame
             </Link>
             <Link
               href="/annuario-storico"
               className="inline-flex items-center gap-2 rounded-full border-2 border-hero-fg/60 px-6 py-3 text-sm font-semibold text-hero-fg transition hover:border-hero-fg hover:bg-hero-fg/10 sm:text-base lg:px-5 lg:py-2.5 lg:text-sm tall:px-6 tall:py-3 tall:text-base"
             >
-              <ScrollText size={16} />
+              <ScrollText className="h-4 w-4" />
               Annuario Storico
             </Link>
           </div>
@@ -66,12 +66,12 @@ export default function HomePage() {
             </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:mt-3 tall:mt-4">
               <MiniStep
-                icon={<Mail size={14} />}
+                icon={<Mail className="h-3.5 w-3.5" />}
                 title="Email istituzionale"
                 body="@unipi.it o @studenti.unipi.it"
               />
               <MiniStep
-                icon={<Camera size={14} />}
+                icon={<Camera className="h-3.5 w-3.5" />}
                 title="Carica la tua foto"
                 body="Per l'annuario: 1 singola e fino a 3 di gruppo."
               />

@@ -20,8 +20,10 @@ export function Navbar() {
   if (isHome) {
     return (
       <header className="absolute inset-x-0 top-0 z-20 lg:grid lg:grid-cols-2">
-        <div className="px-6 pt-4 tall:pt-5">
-          <div className="lg:mx-auto lg:max-w-xl lg:px-10">
+        <div className="pt-4 tall:pt-5">
+          {/* Stessa colonna del contenuto della home (max-w-xl centrata),
+              così logo e testo restano allineati a ogni larghezza. */}
+          <div className="mx-auto max-w-xl px-6 lg:px-10">
             <Affiliation light />
             <div className="mt-3 lg:mt-5 tall:mt-7">
               <Brand light />
@@ -73,7 +75,7 @@ function isActive(pathname: string, href: string) {
 function Affiliation({ light = false }: { light?: boolean }) {
   return (
     <p
-      className={`text-[10px] font-medium uppercase tracking-[0.18em] ${
+      className={`text-[0.625rem] font-medium uppercase tracking-[0.18em] ${
         light ? "text-hero-fg/55" : "text-ink-700/60"
       }`}
     >

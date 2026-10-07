@@ -81,7 +81,7 @@ export function GalleryBoard({
       onClick={() => setIsModalOpen(true)}
       className="inline-flex shrink-0 items-center gap-2 rounded-full bg-unipi-500 px-5 py-2.5 text-sm font-medium text-paper-50 transition hover:bg-unipi-600"
     >
-      <Plus size={16} />
+      <Plus className="h-4 w-4" />
       {addButtonLabel}
     </button>
   );
