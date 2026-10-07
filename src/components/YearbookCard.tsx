@@ -16,7 +16,7 @@ export function YearbookCard({ entry }: { entry: PublicEntry }) {
   const { given, surname } = splitName(entry.names);
 
   return (
-    <article className="mx-auto flex w-full max-w-[15rem] flex-col items-center text-yearbook">
+    <article className="mx-auto flex w-full max-w-[16.5rem] flex-col items-center text-yearbook">
       <div className="relative z-10 aspect-square w-[88%]">
         <Image
           src={publicPhotoSrc(entry.id)}

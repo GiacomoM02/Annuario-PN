@@ -55,6 +55,22 @@
     background: var(--hero-panel-bg);
   }
   .eyebrow {
-    @apply text-xs tracking-wide text-unipi-600;
+    @apply text-xs tracking-wide text-unipi-600 lg:text-sm;
+  }
+  /* Pagine interne (Archivio, Hall of Fame, Annuario Storico, admin) e
+     barra/fondo pagina: stessa colonna, larga quasi tutto lo schermo con un
+     margine di circa il 4% per lato da desktop. */
+  .page-container {
+    @apply mx-auto w-full max-w-[120rem] px-6 lg:px-16;
+  }
+  .page-title {
+    @apply font-display text-4xl font-semibold text-unipi-700 lg:text-5xl;
+  }
+  .page-intro {
+    @apply mt-4 max-w-3xl text-ink-700 lg:text-lg;
+  }
+  /* Pulsante principale delle pagine interne (es. "Aggiungi la tua foto"). */
+  .btn-primary {
+    @apply inline-flex shrink-0 items-center gap-2 rounded-full bg-unipi-500 px-5 py-2.5 text-sm font-medium text-paper-50 transition hover:bg-unipi-600 lg:px-6 lg:py-3 lg:text-base;
   }
 }

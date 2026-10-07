@@ -18,12 +18,12 @@ export default async function AnnuarioStoricoPage() {
   const entries = sortEntriesBySurname(await getInitialEntries());
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-16">
+    <div className="page-container py-16">
       <p className="eyebrow">Sempre aperto</p>
-      <h1 className="mt-2 font-display text-4xl font-semibold text-unipi-700">
+      <h1 className="mt-2 page-title">
         Annuario Storico
       </h1>
-      <p className="mt-4 max-w-2xl text-ink-700">
+      <p className="page-intro">
         Frequenti il PN da tempo ma non hai mai mandato la tua foto per
         l'annuario? Qui puoi farlo in qualsiasi momento: la tua foto, la tua
         facoltà, il tuo nome e una didascalia. Bastano un'email

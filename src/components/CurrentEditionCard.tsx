@@ -12,7 +12,7 @@ function formatDate(iso: string) {
 }
 
 const buttonClass =
-  "inline-flex items-center gap-2 rounded-full bg-hero-band-fg px-5 py-2.5 text-sm font-semibold text-hero-cream shadow-sm transition hover:bg-hero-band-fg/90";
+  "inline-flex items-center gap-2 rounded-full bg-hero-band-fg px-5 py-2.5 text-sm font-semibold text-hero-cream lg:px-6 lg:py-3 lg:text-base shadow-sm transition hover:bg-hero-band-fg/90";
 
 // Barra compatta dell'edizione corrente, pensata per stare sopra la foto
 // di sfondo della home (testo blu Unipi sull'alone azzurro). Con gli invii
@@ -29,12 +29,12 @@ export function CurrentEditionCard() {
   return (
     <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-hero-band-fg/80">
+        <p className="text-xs font-semibold uppercase tracking-wider text-hero-band-fg/80 lg:text-sm">
           {open
             ? `Invii aperti — edizione ${year}`
             : `Edizione ${latest?.year ?? year} · Pubblicata`}
         </p>
-        <p className="mt-1 font-display text-xl font-semibold text-hero-band-fg sm:text-2xl">
+        <p className="mt-1 font-display text-xl font-semibold text-hero-band-fg sm:text-2xl lg:text-3xl">
           {open
             ? `Consegne fino al ${formatDate(submissionsCloseAt)}`
             : `L'Annuario ${latest?.year ?? year} è pronto.`}
@@ -55,7 +55,7 @@ export function CurrentEditionCard() {
         ) : null}
         <Link
           href="/archivio"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-hero-band-fg/90 underline-offset-4 transition hover:text-hero-band-fg hover:underline"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-hero-band-fg/90 lg:text-base underline-offset-4 transition hover:text-hero-band-fg hover:underline"
         >
           Edizioni passate
           <ArrowRight className="h-3.5 w-3.5" />

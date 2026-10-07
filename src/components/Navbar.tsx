@@ -23,7 +23,7 @@ export function Navbar() {
         <div className="pt-4">
           {/* Stessa colonna del contenuto della home (max-w-xl centrata),
               così logo e testo restano allineati a ogni larghezza. */}
-          <div className="mx-auto max-w-xl px-6 lg:px-10">
+          <div className="mx-auto max-w-xl px-6 lg:max-w-[45rem] lg:px-10">
             <Affiliation light />
             <div className="mt-3 lg:mt-5">
               <Brand light />
@@ -40,16 +40,16 @@ export function Navbar() {
 
   return (
     <header className="border-b border-ink-950/10 bg-paper-50/90 backdrop-blur">
-      <div className="mx-auto max-w-7xl px-6 pb-4 pt-3">
+      <div className="page-container pb-4 pt-3">
         <Affiliation />
         <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
           <Brand />
-          <nav className="flex items-center gap-6 sm:gap-8">
+          <nav className="flex items-center gap-6 sm:gap-8 lg:gap-10">
             {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm decoration-unipi-500 underline-offset-4 hover:text-ink-950 hover:underline ${
+                className={`text-sm decoration-unipi-500 lg:text-lg underline-offset-4 hover:text-ink-950 hover:underline ${
                   isActive(pathname, link.href)
                     ? "font-semibold text-unipi-700 underline"
                     : "text-ink-800"
@@ -75,7 +75,7 @@ function isActive(pathname: string, href: string) {
 function Affiliation({ light = false }: { light?: boolean }) {
   return (
     <p
-      className={`text-[0.625rem] font-medium uppercase tracking-[0.18em] ${
+      className={`text-[0.625rem] font-medium uppercase lg:text-xs tracking-[0.18em] ${
         light ? "text-hero-fg/55" : "text-ink-700/60"
       }`}
     >
@@ -85,7 +85,7 @@ function Affiliation({ light = false }: { light?: boolean }) {
 }
 
 function Brand({ light = false }: { light?: boolean }) {
-  const size = light ? "text-2xl lg:text-[2rem]" : "text-lg";
+  const size = light ? "text-2xl lg:text-[2.25rem]" : "text-lg lg:text-2xl";
   return (
     <Link href="/" className="group flex items-baseline gap-2">
       <span
@@ -138,7 +138,7 @@ function NavLinks({
         <Link
           key={link.href}
           href={link.href}
-          className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
+          className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition lg:px-5 lg:py-2.5 lg:text-base ${
             isActive(pathname, link.href) ? t.active : t.link
           }`}
         >

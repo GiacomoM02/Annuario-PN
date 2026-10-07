@@ -21,12 +21,12 @@ export default function ArchivioPage() {
     currentEditionConfig;
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-16">
+    <div className="page-container py-16">
       <p className="eyebrow">Edizioni passate</p>
-      <h1 className="mt-2 font-display text-4xl font-semibold text-unipi-700">
+      <h1 className="mt-2 page-title">
         Archivio
       </h1>
-      <p className="mt-4 max-w-2xl text-ink-700">
+      <p className="page-intro">
         Sfoglia la versione digitale di ogni edizione dell'Annuario del PN,
         oppure scarica il PDF originale per consultarlo offline o stamparlo.
       </p>
@@ -47,7 +47,7 @@ export default function ArchivioPage() {
       {editions.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
           {editions
             .slice()
             .sort((a, b) => b.year - a.year)

@@ -82,7 +82,7 @@ export default async function AdminPage(props: {
   const href = (sec: Section, st: Status) => `/admin?section=${sec}&status=${st}`;
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
+    <div className="page-container py-12">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow">Pannello di moderazione</p>

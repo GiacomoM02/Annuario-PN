@@ -18,15 +18,15 @@ export default async function HallOfFamePage() {
   const entries = sortEntriesBySurname(await getInitialEntries());
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-16">
+    <div className="page-container py-16">
       <p className="eyebrow">La bacheca dei laureati</p>
 
       <GalleryBoard
         title={
-          <h1 className="font-display text-4xl font-semibold text-unipi-700">Hall of Fame</h1>
+          <h1 className="page-title">Hall of Fame</h1>
         }
         intro={
-          <p className="mt-4 max-w-2xl text-ink-700">
+          <p className="page-intro">
             Ti sei laureato? Lascia il segno nel PN: la tua foto, la tua facoltà
             e il tuo nome. Bastano un'email istituzionale e una foto.
           </p>

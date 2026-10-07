@@ -79,9 +79,9 @@ export function GalleryBoard({
   const addButton = (
     <button
       onClick={() => setIsModalOpen(true)}
-      className="inline-flex shrink-0 items-center gap-2 rounded-full bg-unipi-500 px-5 py-2.5 text-sm font-medium text-paper-50 transition hover:bg-unipi-600"
+      className="btn-primary"
     >
-      <Plus className="h-4 w-4" />
+      <Plus className="h-4 w-4 lg:h-5 lg:w-5" />
       {addButtonLabel}
     </button>
   );
@@ -99,7 +99,7 @@ export function GalleryBoard({
       )}
 
       <div className="mt-10 flex items-center justify-between">
-        <p className="text-sm text-ink-700">
+        <p className="text-sm text-ink-700 lg:text-base">
           {entries.length} {entries.length === 1 ? "scheda" : "schede"} finora
         </p>
         {!title && addButton}
@@ -111,7 +111,7 @@ export function GalleryBoard({
         </div>
       ) : (
         variant === "yearbook" ? (
-          <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-12 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-12 sm:grid-cols-3 lg:grid-cols-5 lg:gap-x-8 lg:gap-y-14">
             {entries.map((entry) => (
               <YearbookCard key={entry.id} entry={entry} />
             ))}
