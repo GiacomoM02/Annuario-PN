@@ -20,15 +20,17 @@ export default async function HallOfFamePage() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
       <p className="eyebrow">La bacheca dei laureati</p>
-      <h1 className="mt-2 font-display text-4xl font-semibold text-unipi-700">
-        Hall of Fame
-      </h1>
-      <p className="mt-4 max-w-2xl text-ink-700">
-        Ti sei laureato? Lascia il segno nel PN: la tua foto, la tua facoltà
-        e il tuo nome. Bastano un'email istituzionale e una foto.
-      </p>
 
       <GalleryBoard
+        title={
+          <h1 className="font-display text-4xl font-semibold text-unipi-700">Hall of Fame</h1>
+        }
+        intro={
+          <p className="mt-4 max-w-2xl text-ink-700">
+            Ti sei laureato? Lascia il segno nel PN: la tua foto, la tua facoltà
+            e il tuo nome. Bastano un'email istituzionale e una foto.
+          </p>
+        }
         section="HALL_OF_FAME"
         initialEntries={entries}
         modalEyebrow="Hall of Fame"

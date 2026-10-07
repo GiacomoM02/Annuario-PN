@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Plus } from "lucide-react";
 import { PhotoCard } from "@/components/PhotoCard";
 import { YearbookCard } from "@/components/YearbookCard";
@@ -27,6 +27,8 @@ export function GalleryBoard({
   modalEyebrow,
   submitLabel,
   variant = "default",
+  title,
+  intro,
 }: {
   section: GallerySection;
   initialEntries: PublicEntry[];
@@ -36,6 +38,10 @@ export function GalleryBoard({
   // "yearbook": schede come nelle pagine dell'annuario, in griglia per righe
   // (l'ordine alfabetico si legge da sinistra a destra).
   variant?: "default" | "yearbook";
+  // Se presente, il titolo della pagina viene mostrato qui, con il pulsante
+  // "Aggiungi la tua foto" allineato alla sua destra (e "intro" sotto).
+  title?: ReactNode;
+  intro?: ReactNode;
 }) {
   const [entries, setEntries] = useState(initialEntries);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -70,19 +76,33 @@ export function GalleryBoard({
     if ((e.target as HTMLElement).tagName === "IMG") e.preventDefault();
   }, []);
 
+  const addButton = (
+    <button
+      onClick={() => setIsModalOpen(true)}
+      className="inline-flex shrink-0 items-center gap-2 rounded-full bg-unipi-500 px-5 py-2.5 text-sm font-medium text-paper-50 transition hover:bg-unipi-600"
+    >
+      <Plus size={16} />
+      {addButtonLabel}
+    </button>
+  );
+
   return (
     <div onContextMenu={blockImageMenu} className="[&_img]:select-none [&_img]:[-webkit-touch-callout:none]">
+      {title && (
+        <>
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
+            {title}
+            {addButton}
+          </div>
+          {intro}
+        </>
+      )}
+
       <div className="mt-10 flex items-center justify-between">
         <p className="text-sm text-ink-700">
           {entries.length} {entries.length === 1 ? "scheda" : "schede"} finora
         </p>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 rounded-full bg-unipi-500 px-5 py-2.5 text-sm font-medium text-paper-50 transition hover:bg-unipi-600"
-        >
-          <Plus size={16} />
-          {addButtonLabel}
-        </button>
+        {!title && addButton}
       </div>
 
       {entries.length === 0 ? (
