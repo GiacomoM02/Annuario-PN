@@ -18,16 +18,36 @@ export type YearbookEdition = {
 
 export const editions: YearbookEdition[] = [
   {
-    year: 2026,
-    title: "Annuario del PN — Edizione storica",
-    pdfUrl: "/pdf/annuario-del-pn-2026.pdf",
-    coverImageUrl: "/images/copertine/2026.jpg",
+    year: 2027,
+    title: "Annuario del PN — Seconda edizione",
+    pdfUrl: "/pdf/annuario-del-pn-2027.pdf",
+    coverImageUrl: "/images/copertine/2027.jpg",
   },
+
+   {
+     year: 2027,
+     title: "Annuario del PN — Seconda edizione",
+     pdfUrl: "/pdf/annuario-del-pn-2027.pdf",
+     coverImageUrl: "/images/copertine/2027.jpg",
+   },
+];
+
+
   // Esempio per l'anno prossimo, da scommentare e compilare quando pronto:
+
+export const editions: YearbookEdition[] = [
+  {
+    year: 2028,
+    title: "Annuario del PN — Terza edizione",
+    pdfUrl: "/pdf/annuario-del-pn-2026.pdf",
+    coverImageUrl: "/images/copertine/2028.jpg",
+  },
+
   // {
-  //   year: 2027,
+  //   year: 2028,
   //   title: "Annuario del PN — Seconda edizione",
-  //   pdfUrl: "/pdf/annuario-del-pn-2027.pdf",
-  //   coverImageUrl: "/images/copertine/2027.jpg",
+  //   pdfUrl: "/pdf/annuario-del-pn-2028.pdf",
+  //   coverImageUrl: "/images/copertine/2028.jpg",
   // },
 ];
+
