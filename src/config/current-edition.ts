@@ -10,7 +10,7 @@ export const currentEditionConfig = {
   year: 2026,
 
   // Finestra di invio (formato ISO, con fuso orario esplicito).
-  submissionsOpenAt: "2026-10-25T00:00:00+01:00",
+  submissionsOpenAt: "2026-10-14T00:00:00+01:00",
   submissionsCloseAt: "2026-12-12T23:59:59+02:00",
 
   // Invii massimi per persona (per email istituzionale) in ogni edizione.
