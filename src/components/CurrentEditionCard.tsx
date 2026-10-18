@@ -1,15 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Camera, Download } from "lucide-react";
-import { currentEditionConfig, isSubmissionOpen } from "@/config/current-edition";
-import { editions } from "@/config/editions";
-
-function formatDate(iso: string) {
-  return new Intl.DateTimeFormat("it-IT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(iso));
-}
+import { getDownloadEdition, getSiteSettings, isSubmissionOpen } from "@/lib/site-settings";
+import { formatRomeDate } from "@/lib/rome-time";
 
 const buttonClass =
   "inline-flex items-center gap-2 rounded-full bg-hero-band-fg px-5 py-2.5 text-sm font-semibold text-hero-cream lg:px-6 lg:py-3 lg:text-base shadow-sm transition hover:bg-hero-band-fg/90";
@@ -17,14 +9,12 @@ const buttonClass =
 // Barra compatta dell'edizione corrente, pensata per stare sopra la foto
 // di sfondo della home (testo blu Unipi sull'alone azzurro). Con gli invii
 // aperti porta al modulo nell'Archivio; altrimenti scarica direttamente il
-// PDF dell'ultima edizione pubblicata (la più recente in editions.ts).
-export function CurrentEditionCard() {
-  const { year, submissionsCloseAt } = currentEditionConfig;
-  const open = isSubmissionOpen();
-  const latest = editions.reduce<(typeof editions)[number] | undefined>(
-    (acc, e) => (!acc || e.year > acc.year ? e : acc),
-    undefined
-  );
+// PDF dell'edizione scelta dall'admin nel pannello (Stato del sito).
+export async function CurrentEditionCard() {
+  const settings = await getSiteSettings();
+  const year = settings.submissionYear;
+  const open = isSubmissionOpen(settings);
+  const latest = getDownloadEdition(settings);
 
   return (
     <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
@@ -36,7 +26,7 @@ export function CurrentEditionCard() {
         </p>
         <p className="mt-1 font-display text-xl font-semibold text-hero-band-fg sm:text-2xl lg:text-3xl">
           {open
-            ? `Consegne fino al ${formatDate(submissionsCloseAt)}`
+            ? `Consegne fino al ${formatRomeDate(settings.closesAt)}`
             : `L'Annuario ${latest?.year ?? year} è pronto.`}
         </p>
       </div>

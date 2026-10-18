@@ -50,14 +50,14 @@ const PROJECT_ROOT = path.resolve(__dirname, "..");
 // -----------------------------------------------------------------------
 // Argomenti da riga di comando
 // -----------------------------------------------------------------------
-function parseArgs() {
+async function parseArgs() {
   const args = Object.fromEntries(
     process.argv.slice(2).map((a) => {
       const [k, ...v] = a.replace(/^--/, "").split("=");
       return [k, v.length ? v.join("=") : true];
     })
   );
-  const year = Number(args.year || getConfiguredYear());
+  const year = Number(args.year || (await getConfiguredYear()));
   return {
     year,
     // Anno accademico: l'edizione 2027 raccoglie l'anno 2026-27.
@@ -298,7 +298,7 @@ function buildHtml({ singles, groups, subtitle, premessa, emblem, facultyIcons }
 }
 
 async function main() {
-  const { year, subtitle, out } = parseArgs();
+  const { year, subtitle, out } = await parseArgs();
 
   console.log(`Recupero le foto approvate per l'edizione ${year}...`);
   const { rows } = await sql.query(
@@ -383,14 +383,18 @@ async function main() {
   console.log(`✓ PDF generato: ${outputPath}`);
 }
 
-// Legge l'anno dell'edizione corrente da src/config/current-edition.ts
-// senza dover compilare TypeScript (semplice estrazione testuale della
-// riga "year: ####").
-function getConfiguredYear() {
-  const configPath = path.join(PROJECT_ROOT, "src/config/current-edition.ts");
-  const content = fs.readFileSync(configPath, "utf8");
-  const match = content.match(/year:\s*(\d{4})/);
-  return match ? Number(match[1]) : new Date().getFullYear();
+// Anno dell'edizione per cui si stanno raccogliendo le foto: quello
+// impostato dall'admin nel pannello (Stato del sito), salvato nel database.
+// Se non è disponibile si usa l'anno in corso; si può sempre forzare con
+// --year=####.
+async function getConfiguredYear() {
+  try {
+    const { rows } = await sql.query("SELECT submission_year FROM site_settings WHERE id = 1");
+    if (rows[0]) return Number(rows[0].submission_year);
+  } catch (err) {
+    console.warn("Impossibile leggere l'anno dal pannello:", err.message);
+  }
+  return new Date().getFullYear();
 }
 
 if (require.main === module) {

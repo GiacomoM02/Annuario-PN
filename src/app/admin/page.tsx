@@ -11,6 +11,10 @@ import {
   setPendingEntryAction,
 } from "@/lib/admin-actions";
 import { DeleteButton } from "./DeleteButton";
+import { SiteSettingsForm } from "./SiteSettingsForm";
+import { editions } from "@/config/editions";
+import { getDownloadEdition, getSiteSettings, isSubmissionOpen } from "@/lib/site-settings";
+import { dateToRomeLocal, formatRomeDate } from "@/lib/rome-time";
 import type { HallOfFameEntry } from "../../../drizzle/schema";
 
 export const dynamic = "force-dynamic";
@@ -85,9 +89,9 @@ export default async function AdminPage(props: {
     <div className="page-container py-12">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="eyebrow">Pannello di moderazione</p>
+          <p className="eyebrow">Pannello admin</p>
           <h1 className="mt-2 font-display text-3xl font-semibold text-unipi-700">
-            Foto inviate
+            Gestione del sito
           </h1>
         </div>
         <form action={logoutAction}>
@@ -97,6 +101,12 @@ export default async function AdminPage(props: {
           </button>
         </form>
       </div>
+
+      <div className="mt-8">
+        <SiteSettingsPanel />
+      </div>
+
+      <h2 className="mt-12 font-display text-xl font-semibold text-unipi-700">Moderazione delle foto</h2>
 
       {/* Sezioni, con il numero di foto in attesa */}
       <div className="mt-8 flex flex-wrap gap-2">
@@ -225,5 +235,44 @@ function AdminEntryCard({ entry }: { entry: HallOfFameEntry }) {
         </form>
       </div>
     </article>
+  );
+}
+
+// Riquadro "Stato del sito": legge le impostazioni attuali e descrive in
+// chiaro cosa vede adesso un visitatore.
+async function SiteSettingsPanel() {
+  const s = await getSiteSettings();
+  const now = new Date();
+  const edition = getDownloadEdition(s);
+  const download = edition ? `la Home propone il download di «${edition.title}» (${edition.year}).` : "nessuna edizione da scaricare.";
+  const closes = formatRomeDate(s.closesAt, true);
+
+  let status: string;
+  let tone: "open" | "waiting" | "closed";
+  if (isSubmissionOpen(s, now)) {
+    status = `invii APERTI per l'Annuario ${s.submissionYear}, fino al ${closes}.`;
+    tone = "open";
+  } else if (s.mode === "SUBMISSIONS" && now < s.opensAt) {
+    status = `invii per l'Annuario ${s.submissionYear} programmati dal ${formatRomeDate(s.opensAt, true)} al ${closes}. Fino ad allora ${download}`;
+    tone = "waiting";
+  } else if (s.mode === "SUBMISSIONS") {
+    status = `invii per l'Annuario ${s.submissionYear} chiusi il ${closes}: ${download}`;
+    tone = "closed";
+  } else {
+    status = `invii chiusi: ${download}`;
+    tone = "closed";
+  }
+
+  return (
+    <SiteSettingsForm
+      mode={s.mode}
+      submissionYear={s.submissionYear}
+      opensAt={dateToRomeLocal(s.opensAt)}
+      closesAt={dateToRomeLocal(s.closesAt)}
+      downloadYear={s.downloadYear}
+      editions={editions.map((e) => ({ year: e.year, title: e.title }))}
+      status={status}
+      statusTone={tone}
+    />
   );
 }

@@ -1,24 +1,20 @@
 import Image from "next/image";
 import { Download, FileText } from "lucide-react";
 import { editions } from "@/config/editions";
-import { currentEditionConfig, isSubmissionOpen } from "@/config/current-edition";
+import { currentEditionConfig } from "@/config/current-edition";
+import { getSiteSettings, isSubmissionOpen } from "@/lib/site-settings";
+import { formatRomeDate } from "@/lib/rome-time";
 import { EditionSubmitCard } from "@/components/EditionSubmitCard";
 
 // Le date della finestra di invio cambiano nel tempo: pagina dinamica, così
 // il riquadro per mandare le foto compare e sparisce da solo.
 export const dynamic = "force-dynamic";
 
-function formatDate(iso: string) {
-  return new Intl.DateTimeFormat("it-IT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(iso));
-}
-
-export default function ArchivioPage() {
-  const { year, submissionsCloseAt, maxSinglePerPerson, maxGroupPerPerson } =
-    currentEditionConfig;
+export default async function ArchivioPage() {
+  const { maxSinglePerPerson, maxGroupPerPerson } = currentEditionConfig;
+  // Modalità, anno e date decisi dall'admin nel pannello (Stato del sito).
+  const settings = await getSiteSettings();
+  const year = settings.submissionYear;
 
   return (
     <div className="page-container py-16">
@@ -31,11 +27,11 @@ export default function ArchivioPage() {
         oppure scarica il PDF originale per consultarlo offline o stamparlo.
       </p>
 
-      {isSubmissionOpen() && (
+      {isSubmissionOpen(settings) && (
         <div id="invia" className="mt-10 scroll-mt-24">
           <EditionSubmitCard
             year={year}
-            closesOn={formatDate(submissionsCloseAt)}
+            closesOn={formatRomeDate(settings.closesAt)}
             maxSingle={maxSinglePerPerson}
             maxGroup={maxGroupPerPerson}
           />

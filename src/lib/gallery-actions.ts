@@ -11,7 +11,8 @@ import {
   emailDomainSchema,
   gallerySingleSchema,
 } from "@/lib/validations";
-import { currentEditionConfig, isSubmissionOpen } from "@/config/current-edition";
+import { currentEditionConfig } from "@/config/current-edition";
+import { getSiteSettings, isSubmissionOpen } from "@/lib/site-settings";
 import {
   getApprovedEntries,
   isPublicSection,
@@ -151,9 +152,12 @@ function isUniqueViolation(err: unknown): boolean {
 }
 
 export async function createEditionEntryAction(formData: FormData): Promise<ActionResult> {
-  const { year, maxSinglePerPerson, maxGroupPerPerson } = currentEditionConfig;
+  const { maxSinglePerPerson, maxGroupPerPerson } = currentEditionConfig;
+  // Anno e apertura decisi dall'admin nel pannello (Stato del sito).
+  const settings = await getSiteSettings();
+  const year = settings.submissionYear;
 
-  if (!isSubmissionOpen()) {
+  if (!isSubmissionOpen(settings)) {
     return { ok: false, error: `Gli invii per l'edizione ${year} sono chiusi.` };
   }
 

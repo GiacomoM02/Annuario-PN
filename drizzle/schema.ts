@@ -8,6 +8,7 @@ import {
   integer,
   smallint,
   uniqueIndex,
+  check,
 } from "drizzle-orm/pg-core";
 
 // ---------------------------------------------------------------------------
@@ -77,3 +78,23 @@ export const hallOfFameEntries = pgTable("hall_of_fame_entries", {
 
 export type HallOfFameEntry = typeof hallOfFameEntries.$inferSelect;
 export type NewHallOfFameEntry = typeof hallOfFameEntries.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// TABELLA: site_settings
+// Una sola riga (id = 1) con lo stato del sito deciso dall'admin dal pannello:
+// modalità (invio foto o download), anno dell'edizione per cui si raccolgono
+// le foto, intervallo di apertura degli invii ed edizione da far scaricare.
+// Vedi src/lib/site-settings.ts.
+// ---------------------------------------------------------------------------
+export const siteSettings = pgTable("site_settings", {
+  id: smallint("id").primaryKey().default(1),
+  mode: text("mode").notNull(), // "SUBMISSIONS" | "DOWNLOAD"
+  submissionYear: integer("submission_year").notNull(),
+  opensAt: timestamp("opens_at", { withTimezone: true }).notNull(),
+  closesAt: timestamp("closes_at", { withTimezone: true }).notNull(),
+  downloadYear: integer("download_year"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [
+  check("site_settings_single_row", sql`${t.id} = 1`),
+  check("site_settings_mode", sql`${t.mode} in ('SUBMISSIONS', 'DOWNLOAD')`),
+]);

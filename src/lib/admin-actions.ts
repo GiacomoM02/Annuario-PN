@@ -6,6 +6,9 @@ import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { del } from "@vercel/blob";
 import { db, schema } from "@/lib/db";
+import { editions } from "@/config/editions";
+import { getSiteSettings } from "@/lib/site-settings";
+import { romeLocalToDate } from "@/lib/rome-time";
 import {
   ADMIN_COOKIE,
   SESSION_HOURS,
@@ -97,4 +100,63 @@ export async function deleteEntryAction(id: string) {
     }
   }
   revalidateGalleries();
+}
+
+// ---------------------------------------------------------------------------
+// Stato del sito (riquadro in cima al pannello): invio foto o download,
+// anno dell'edizione, intervallo di apertura ed edizione da scaricare.
+// ---------------------------------------------------------------------------
+export type SiteSettingsFormState = { ok: boolean; message: string | null };
+
+export async function saveSiteSettingsAction(
+  _prev: SiteSettingsFormState,
+  formData: FormData
+): Promise<SiteSettingsFormState> {
+  await requireAdmin();
+
+  const mode = formData.get("mode");
+  if (mode !== "SUBMISSIONS" && mode !== "DOWNLOAD") {
+    return { ok: false, message: "Scegli se aprire gli invii o proporre il download." };
+  }
+
+  const downloadYear = Number(formData.get("downloadYear"));
+  if (!editions.some((e) => e.year === downloadYear)) {
+    return { ok: false, message: "Scegli un'edizione da scaricare tra quelle pubblicate." };
+  }
+
+  // Le date restano quelle salvate se si passa a "download" senza toccarle;
+  // con gli invii aperti sono obbligatorie e devono essere coerenti.
+  const current = await getSiteSettings();
+  let submissionYear = current.submissionYear;
+  let opensAt = current.opensAt;
+  let closesAt = current.closesAt;
+
+  if (mode === "SUBMISSIONS") {
+    submissionYear = Number(formData.get("submissionYear"));
+    if (!Number.isInteger(submissionYear) || submissionYear < 2020 || submissionYear > 2100) {
+      return { ok: false, message: "Indica l'anno dell'edizione (per esempio 2027)." };
+    }
+    const o = romeLocalToDate(String(formData.get("opensAt") ?? ""));
+    const c = romeLocalToDate(String(formData.get("closesAt") ?? ""));
+    if (!o || !c) {
+      return { ok: false, message: "Indica data e ora di apertura e di chiusura degli invii." };
+    }
+    if (c <= o) {
+      return { ok: false, message: "La chiusura deve essere dopo l'apertura." };
+    }
+    opensAt = o;
+    closesAt = c;
+  }
+
+  const values = { mode, submissionYear, opensAt, closesAt, downloadYear, updatedAt: new Date() };
+  await db
+    .insert(schema.siteSettings)
+    .values({ id: 1, ...values })
+    .onConflictDoUpdate({ target: schema.siteSettings.id, set: values });
+
+  // Home, Archivio e pannello mostrano subito il nuovo stato.
+  revalidatePath("/");
+  revalidatePath("/archivio");
+  revalidatePath("/admin");
+  return { ok: true, message: "Impostazioni salvate: il sito è già aggiornato." };
 }
