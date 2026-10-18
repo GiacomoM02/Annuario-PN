@@ -31,6 +31,23 @@
     }
   }
 
+  /* Pannello admin (.admin-screen): da computer occupa esattamente lo
+     schermo sotto la barra del sito, senza fondo pagina e senza scorrere. */
+  body:has(.admin-screen) footer {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    body:has(.admin-screen) > .relative {
+      height: 100dvh;
+      min-height: 0;
+    }
+    body:has(.admin-screen) main {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+  }
+
   ::selection {
     @apply bg-unipi-400/40;
   }

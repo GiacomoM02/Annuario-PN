@@ -1,9 +1,5 @@
-"use client";
-
-import { useState } from "react";
-import { Camera } from "lucide-react";
-import { UploadModal } from "@/components/UploadModal";
-import { UploadForm } from "@/components/UploadForm";
+import { EditionSubmitButton } from "@/components/EditionSubmitButton";
+import { editionLabel } from "@/lib/edition-label";
 
 /**
  * Riquadro della pagina Archivio per mandare le foto dell'edizione in corso
@@ -20,14 +16,12 @@ export function EditionSubmitCard({
   maxSingle: number;
   maxGroup: number;
 }) {
-  const [open, setOpen] = useState(false);
-
   return (
     <div className="rounded-lg border border-unipi-100 bg-unipi-50 p-6 sm:flex sm:items-center sm:justify-between sm:gap-8">
       <div>
         <p className="eyebrow">Invii aperti fino al {closesOn}</p>
         <h2 className="mt-1 font-display text-xl font-semibold text-unipi-700 lg:text-2xl">
-          Manda la tua foto per l'Annuario {year}
+          Manda la tua foto per l'Annuario {editionLabel(year)}
         </h2>
         <p className="mt-2 max-w-xl text-sm text-ink-700 lg:text-base">
           Ognuno può mandare {maxSingle === 1 ? "una foto singola" : `${maxSingle} foto singole`}{" "}
@@ -35,27 +29,7 @@ export function EditionSubmitCard({
           Dopo la verifica finiranno nel PDF dell'edizione.
         </p>
       </div>
-      <button
-        onClick={() => setOpen(true)}
-        className="btn-primary mt-5 sm:mt-0"
-      >
-        <Camera size={16} />
-        Invia la tua foto
-      </button>
-
-      <UploadModal
-        eyebrow={`Annuario ${year}`}
-        title="Invia la tua foto"
-        open={open}
-        onClose={() => setOpen(false)}
-      >
-        <UploadForm
-          mode="edition"
-          year={year}
-          submitLabel={`Invia per l'Annuario ${year}`}
-          onUploaded={() => setOpen(false)}
-        />
-      </UploadModal>
+      <EditionSubmitButton year={year} className="btn-primary mt-5 sm:mt-0" />
     </div>
   );
 }

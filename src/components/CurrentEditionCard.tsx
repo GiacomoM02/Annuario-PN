@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { ArrowRight, Camera, Download } from "lucide-react";
+import { ArrowRight, Download } from "lucide-react";
+import { EditionSubmitButton } from "@/components/EditionSubmitButton";
+import { editionLabel } from "@/lib/edition-label";
 import { getDownloadEdition, getSiteSettings, isSubmissionOpen } from "@/lib/site-settings";
 import { formatRomeDate } from "@/lib/rome-time";
 
@@ -8,7 +10,7 @@ const buttonClass =
 
 // Barra compatta dell'edizione corrente, pensata per stare sopra la foto
 // di sfondo della home (testo blu Unipi sull'alone azzurro). Con gli invii
-// aperti porta al modulo nell'Archivio; altrimenti scarica direttamente il
+// aperti apre direttamente il modulo di invio; altrimenti scarica direttamente il
 // PDF dell'edizione scelta dall'admin nel pannello (Stato del sito).
 export async function CurrentEditionCard() {
   const settings = await getSiteSettings();
@@ -21,22 +23,19 @@ export async function CurrentEditionCard() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-wider text-hero-band-fg/80 lg:text-sm">
           {open
-            ? `Invii aperti — edizione ${year}`
-            : `Edizione ${latest?.year ?? year} · Pubblicata`}
+            ? `Invii aperti — edizione ${editionLabel(year)}`
+            : `Edizione ${editionLabel(latest?.year ?? year)} · Pubblicata`}
         </p>
         <p className="mt-1 font-display text-xl font-semibold text-hero-band-fg sm:text-2xl lg:text-3xl">
           {open
             ? `Consegne fino al ${formatRomeDate(settings.closesAt)}`
-            : `L'Annuario ${latest?.year ?? year} è pronto.`}
+            : `L'Annuario ${editionLabel(latest?.year ?? year)} è pronto.`}
         </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         {open ? (
-          <Link href="/archivio#invia" className={buttonClass}>
-            <Camera className="h-4 w-4" />
-            Invia la tua foto
-          </Link>
+          <EditionSubmitButton year={year} className={buttonClass} />
         ) : latest ? (
           <a href={latest.pdfUrl} download className={buttonClass}>
             <Download className="h-4 w-4" />

@@ -4,6 +4,7 @@ import { editions } from "@/config/editions";
 import { currentEditionConfig } from "@/config/current-edition";
 import { getSiteSettings, isSubmissionOpen } from "@/lib/site-settings";
 import { formatRomeDate } from "@/lib/rome-time";
+import { editionLabel } from "@/lib/edition-label";
 import { EditionSubmitCard } from "@/components/EditionSubmitCard";
 
 // Le date della finestra di invio cambiano nel tempo: pagina dinamica, così
@@ -73,7 +74,7 @@ export default async function ArchivioPage() {
                     <h2 className="font-display text-lg font-semibold text-ink-950">
                       {edition.title}
                     </h2>
-                    <p className="text-sm text-ink-600">{edition.year}</p>
+                    <p className="text-sm text-ink-600">{editionLabel(edition.year)}</p>
                   </div>
                   <a
                     href={edition.pdfUrl}

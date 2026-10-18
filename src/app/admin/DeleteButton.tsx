@@ -13,7 +13,7 @@ export function DeleteButton() {
           e.preventDefault();
         }
       }}
-      className="inline-flex items-center gap-1.5 rounded-full border border-red-300 px-3 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-50"
+      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-red-300 px-3 py-1 text-xs font-medium text-red-700 transition hover:bg-red-50"
     >
       <Trash2 size={13} />
       Elimina

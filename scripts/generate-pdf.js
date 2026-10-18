@@ -18,7 +18,7 @@
  *   npm run generate:pdf -- --year=2027 --subtitle="Seconda edizione" --out=output/prova.pdf
  *
  * Sottotitolo della copertina: di default è l'anno accademico, calcolato
- * dall'anno dell'edizione (2027 -> "Edizione 2026-27").
+ * dall'anno dell'edizione (2027 -> "Edizione 2026-2027").
  *
  * Premessa (pagina 1): il testo di content/premessa-<anno>.txt se esiste,
  * altrimenti quello di content/premessa.txt (la premessa della prima
@@ -60,8 +60,8 @@ async function parseArgs() {
   const year = Number(args.year || (await getConfiguredYear()));
   return {
     year,
-    // Anno accademico: l'edizione 2027 raccoglie l'anno 2026-27.
-    subtitle: args.subtitle || `Edizione ${year - 1}-${String(year).slice(-2)}`,
+    // Anno accademico: l'edizione 2027 raccoglie l'anno 2026-2027.
+    subtitle: args.subtitle || `Edizione ${year - 1}-${year}`,
     out: args.out || null,
   };
 }

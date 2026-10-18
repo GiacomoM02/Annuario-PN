@@ -13,6 +13,7 @@ import {
 } from "@/lib/validations";
 import { currentEditionConfig } from "@/config/current-edition";
 import { getSiteSettings, isSubmissionOpen } from "@/lib/site-settings";
+import { editionLabel } from "@/lib/edition-label";
 import {
   getApprovedEntries,
   isPublicSection,
@@ -156,9 +157,10 @@ export async function createEditionEntryAction(formData: FormData): Promise<Acti
   // Anno e apertura decisi dall'admin nel pannello (Stato del sito).
   const settings = await getSiteSettings();
   const year = settings.submissionYear;
+  const label = editionLabel(year);
 
   if (!isSubmissionOpen(settings)) {
-    return { ok: false, error: `Gli invii per l'edizione ${year} sono chiusi.` };
+    return { ok: false, error: `Gli invii per l'edizione ${label} sono chiusi.` };
   }
 
   const emailCheck = emailDomainSchema.safeParse({
@@ -191,8 +193,8 @@ export async function createEditionEntryAction(formData: FormData): Promise<Acti
   const max = type === "SINGLE" ? maxSinglePerPerson : maxGroupPerPerson;
   const limitError =
     type === "SINGLE"
-      ? `Hai già inviato la tua foto singola per l'edizione ${year}.`
-      : `Hai già inviato ${maxGroupPerPerson} foto di gruppo per l'edizione ${year}: è il massimo consentito.`;
+      ? `Hai già inviato la tua foto singola per l'edizione ${label}.`
+      : `Hai già inviato ${maxGroupPerPerson} foto di gruppo per l'edizione ${label}: è il massimo consentito.`;
 
   // Ogni invio occupa un "posto" numerato da 1 a max. L'indice unico sul
   // database impedisce che due invii prendano lo stesso posto, anche se

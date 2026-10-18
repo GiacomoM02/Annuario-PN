@@ -11,6 +11,7 @@ import {
 import { facultyOptions } from "@/lib/faculties";
 import { SINGLE_CAPTION_MAX } from "@/lib/validations";
 import { cn } from "@/lib/utils";
+import { editionLabel } from "@/lib/edition-label";
 
 type Step = "email" | "details" | "success";
 type PhotoType = "SINGLE" | "GROUP";
@@ -235,7 +236,7 @@ export function UploadForm(
           </h3>
           <p className="max-w-sm text-sm text-ink-700">
             {props.mode === "edition"
-              ? `Grazie! La tua foto è in attesa di verifica: una volta approvata, finirà nell'Annuario ${props.year}.`
+              ? `Grazie! La tua foto è in attesa di verifica: una volta approvata, finirà nell'Annuario ${editionLabel(props.year)}.`
               : `Grazie ${submittedName.split(",")[0].trim()}. La tua foto è in attesa di approvazione: comparirà nella galleria non appena il team l'avrà verificata.`}
           </p>
           <button
